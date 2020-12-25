@@ -1,0 +1,357 @@
+body {
+  margin: 0;
+  background-color: #E5E5E5;
+}
+
+#header {
+  background: #3A2F33;
+  padding: 0 2rem;
+  justify-content: center;
+}
+
+#navbar-menu, .navbar-item {
+  background: #3A2F33;
+  color: #F5E6DE !important;
+}
+
+nav .nav-user-icon {
+  max-height: 4rem;
+  border-radius: 50%;
+}
+
+nav #nav-search-box {
+  border-radius: 100px;
+  background-color: #F5E6DE;
+}
+
+nav .navbar-item:hover {
+  background-color: #292929;
+  color: #F5E6DE;
+}
+
+nav .fa {
+  color: #F5E6DE;
+}
+
+.bd-main {
+  padding-top: 4rem;
+  min-height: 100vh;
+  justify-content: center;
+  display: flex;
+}
+
+.fixed-aside {
+  text-align: left;
+  z-index: 30;
+  position: fixed;
+  margin-top: 2rem;
+  left: 1rem;
+}
+
+.fixed-aside .rows {
+  margin-top: 1.5rem;
+}
+
+.fixed-aside .rows li {
+  margin: 1rem 0;
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+.card-main {
+  padding: 0;
+}
+
+#card {
+  margin: 0 auto;
+  padding: 4rem 0;
+}
+
+#card-bg {
+  background: #DCDCDC;
+  text-align: center;
+  width: 100vw;
+}
+
+#card-body {
+  border: solid 0.2rem #52474F;
+  max-width: 960px;
+  background: white;
+  margin: auto;
+  position: relative;
+}
+
+#card-body [class^="icon"] {
+  position: relative;
+  top: 0.75rem;
+  max-width: 2.5rem;
+  padding-right: 0.1rem;
+  right: 0.2rem;
+}
+
+#card-body .card-icon {
+  max-width: 256px;
+  min-width: 128px;
+  border-radius: 50%;
+  border: solid 0.15rem #52474F;
+}
+
+#card-body h1 {
+  font-size: 1.5rem;
+}
+
+#card-body a {
+  word-break: break-all;
+}
+
+.hobby-attribute {
+  justify-content: center;
+  border-bottom: solid 0.3rem gray;
+  display: flex;
+  flex-direction: row;
+}
+
+.modal-content .hobby-attribute img {
+  padding-left: 12.5px;
+}
+
+@media screen and (max-width: 480px) {
+
+  .container {
+    margin: 0 0.5rem;
+  }
+
+}
+
+@media screen and (min-width: 481px) {
+
+  .container {
+    margin: 0 2rem;
+  }
+
+}
+
+@media screen and (min-width: 770px) {
+
+  #card-body {
+    position: relative;
+    width: 100%;
+  }
+  
+  
+  
+  #card-body::before {
+    content: "";
+    display: block;
+    padding-top: 60.45949214026602%;
+  }
+  
+  #child {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+
+}
+
+.field-label {
+  text-align: left;
+}
+
+.hobby-attribute .column {
+  padding: 0.25rem;
+}
+
+.card-button {
+  border-radius: 10px;
+  background-color: #D58B50;
+  color: #F5E6DE;
+}
+
+.card-button img {
+  max-width: 2rem;
+}
+
+.card-button span {
+  padding-left: 1rem;
+}
+
+.card-button:hover {
+  color: #F5E6DE;
+  background-color: #d7aa87;
+}
+
+.card-button:focus {
+  color: #f5e6de;
+  border-color: #d58b50;
+}
+
+.topics-topic {
+  margin-top: 5rem;
+}
+
+@media screen and (min-width: 780px) {
+
+  .topics-topic {
+    width: 960px;
+  }
+
+}
+
+.topic .date {
+  text-align: center;
+}
+
+.topic .category {
+  display: flex;
+}
+
+.topic hr {
+  height: 0.2rem;
+  margin: 0.5rem 0;
+  background-color: #3A2F33;
+}
+
+.topic .topic-links {
+  margin-top: auto;
+  text-align: right;
+}
+
+.topic .topic-links a {
+  text-decoration: underline;
+}
+
+.topic-container {
+  margin: auto;
+  max-width: 960px;
+}
+
+.topic-container .card {
+  border-radius: 10px;
+  margin: 1rem;
+}
+
+.category {
+  display: flex;
+  flex-direction: column;
+}
+
+.category span {
+  padding-left: 0.5rem;
+}
+
+.category-icon {
+  vertical-align: -0.1rem;
+  max-width: 1rem;
+  border: solid;
+  border-radius: 50%;
+  border-color: #d58b50;
+  background-color: #d58b50;
+}
+
+.focused-topic-title {
+  margin: auto;
+  padding-bottom: 2rem;
+}
+
+.topics-title {
+  margin-top: 2rem;
+}
+
+.topics-selector {
+  margin: 2rem;
+}
+
+.topics-selector .sub-title {
+  font-size: 1.25rem;
+}
+
+.category-icon-wrapper {
+  padding-left: 0.5rem;
+}
+
+.tabs:not(:last-child) {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 980px) {
+
+  .card-body, .topic-container {
+    max-width: 720px;
+  }
+
+}
+
+@media (max-width: 980px) {
+
+  .fixed-aside {
+    visibility: hidden;
+  }
+
+}
+
+@media screen and (min-width: 769px) {
+
+  .modal-content, .modal-card {
+    width: 980px;
+  }
+
+}
+
+@media screen and (min-width: 769px) {
+
+  #card-body {
+    font-size: 1.5rem;
+  }
+  
+  #card-body h1 {
+    font-size: 2rem;
+  }
+
+}
+
+@media screen and (max-width: 1200px) {
+
+  #card-body {
+    font-size: 1rem;
+  }
+  
+  #card-body .card-icon {
+    max-width: 158px;
+  }
+  
+  #card-body, .card, .topic-container {
+    max-width: 720px;
+  }
+
+}
+
+@media screen and (min-width: 1408px) {
+
+  .focused-topic-title:not(.is-max-desktop):not(.is-max-widescreen), topics-title {
+    max-width: 1000px;
+  }
+
+}
+
+@media screen and (max-width: 1407px) and (min-width: 980px) {
+
+  .focused-topic-title:not(.is-max-desktop):not(.is-max-widescreen), .topics-title {
+    margin-left: 8rem;
+    margin-right: 8rem;
+  }
+
+}
+
+@media screen and (max-width: 979px) {
+
+  .focused-topic-title:not(.is-max-desktop):not(.is-max-widescreen), .topics-title {
+    margin-left: 5rem;
+    margin-right: 5rem;
+  }
+
+}

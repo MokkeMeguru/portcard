@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script defer src="https://use.fontawesome.com/releases/v5.6.0/js/all.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>
+
+        
+    <script src="https://www.gstatic.com/firebasejs/ui/4.7.1/firebase-ui-auth__ja.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.7.1/firebase-ui-auth.css" />
+
+    <link href="css/mystyles.css" rel="stylesheet" type="text/css">
+    <link href="css/screen.css" rel="stylesheet" type="text/css">
+    
+    <title>portcard</title>
+  </head>
+  <body>
+    <noscript>
+      portcard is a JavaScript app. Please enable JavaScript to continue.
+    </noscript>
+    <div id="app"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-auth.js"></script>
+     
+    <script>
+     // your web app's firebase configuration
+     var firebaseConfig = {
+         apiKey: "AIzaSyDZVXGv8u0ivt-I_QrmERDVrnJp6Grqq_M",
+         authDomain: "auth-example-b4be9.firebaseapp.com",
+         projectId: "auth-example-b4be9",
+         storageBucket: "auth-example-b4be9.appspot.com",
+         messagingSenderId: "261119699722",
+         appId: "1:261119699722:web:6b84d31a77da20ad2028f3"
+      };
+     // Initialize Firebase
+     firebase.initializeApp(firebaseConfig);
+     var ui = new firebaseui.auth.AuthUI(firebase.auth())
+    </script>
+
+    
+    <script src="js/compiled/app.js"></script>
+    <script>
+     if ('serviceWorker' in navigator) {
+         navigator.serviceWorker
+                  .register("sw.js")
+                  .then(function() {console.log("service worker registered")})
+     }
+    </script>
+
+    <script>
+     $(document).ready(function() {
+
+         $('.navbar-burger').on('click', function(e) {
+             e.preventDefault();
+             console.log("clicked")
+             // Get the target from the "data-target" attribute
+             var target = $(this).data('target');
+             var $target = $('#' + target);
+
+             // Toggle the class on both the "navbar-burger" and the "navbar-menu"
+             $(this).toggleClass('is-active');
+             $target.toggleClass('is-active');
+         });
+     });
+    </script>
+
+  </body>
+</html>
