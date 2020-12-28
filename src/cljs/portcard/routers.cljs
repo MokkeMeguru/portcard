@@ -21,7 +21,8 @@
             [portcard.services.card.views :as card-views]
             [portcard.domains.routes :as routes-domain]
             [portcard.services.topics.views :as topics-views]
-            [portcard.services.contact.views :as contact-views]))
+            [portcard.services.contact.views :as contact-views]
+            [portcard.services.auth.events :as auth-events]))
 
 (def routes
   ["/"
@@ -33,11 +34,12 @@
                     :start (fn [{:keys [query]}]
                              (when-let [message (:message query)]
                                (println query "is querys")))
+
                     :stop (fn []
                             (re-frame/dispatch [::events/drop-server-code]))}]}]
    ["users"
     {:link-text "users"}
-    ["/:id"
+    ["/:user-id"
      {:name ::routes-domain/user-page
       :link-text "user page"
       :coercion reitit.coercion.spec/coercion
@@ -45,9 +47,9 @@
       card-views/card
       :parameters {:path {:user-id string?}}
       :controllers
-      [{:parameters {:path [:id]}
+      [{:parameters {:path [:user-id]}
         :start (fn [{:keys [path]}]
-                 (println "entering user " (:id path) " page"))}]}]
+                 (println "entering user " (:user-id path) " page"))}]}]
     ;; ["/:id/topics"
     ;;  {:name ::user-topics
     ;;   :link-text "user topics page"
@@ -97,7 +99,24 @@
    ["login"
     {:name ::routes-domain/login
      :view auth-views/login
-     :link-text "login"}]
+     :link-text "login"
+     :controllers
+     [{:start (fn [_]
+                (re-frame/dispatch [::auth-events/restore-firebase-auth-status])
+                (when (= "passed"  (.getItem js/sessionStorage :firebase-auth))
+                  (re-frame/dispatch [::auth-events/store-firebase-auth-status "not-passed"])
+                  (rfe/push-state ::routes-domain/home)
+                  (rfe/replace-state ::routes-domain/home))
+                (when (= "wait-server-response" (.getItem js/sessionStorage :firebase-auth))
+                  (.onAuthStateChanged
+                   (.. js/firebase auth)
+                   (fn [user]
+                     (if user
+                       (.then (.getIdToken (.. js/firebase auth -currentUser) true)
+                              (fn [id-token]
+                                (re-frame/dispatch [::auth-events/login {:message? true
+                                                                         :id-token id-token}])))
+                       (print "unknown error"))))))}]}]
    ;; ["new-topic"
    ;;  {:name ::new-topic
    ;;   :view [:div "post new topic"]
@@ -132,12 +151,11 @@
    {:use-fragment false}))
 
 
+;;(rf/match-by-path router "/")
 ;; (r/match-by-path router "/")
-;; (r/match-by-path router "")
 
 
-
-;; (r/match-by-path router "/users/hello")
+;; (rf/match-by-path router "/users/Meguru")
 ;; (r/match-by-path router "/users/hello/topics")
 
 

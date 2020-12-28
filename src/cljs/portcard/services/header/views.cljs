@@ -1,7 +1,12 @@
 (ns portcard.services.header.views
   (:require [portcard.utils.views :refer [toggle-class]]
             [reitit.frontend.easy :as rfe]
-            [portcard.domains.routes :as routes-domain]))
+            [portcard.domains.routes :as routes-domain]
+            [portcard.services.auth.subs :as auth-subs]
+            [portcard.services.auth.events :as auth-events]
+            [reagent.core :as r]
+            [re-frame.core :as re-frame]
+            [portcard.subs :as subs]))
 
 (defn navbar-toggle [e]
   (.preventDefault e)
@@ -29,18 +34,20 @@
      [:span.icon.is-left>i.fas.fa-search]]]])
 
 (defn logined-nav []
-  (let [user-name "sample-user"
-        user-icon "/img/sample-user-icon.png"]
-    [:<>
-     [:a.navbar-item {:href (str "/#/users/" user-name)}
-      [:div.container>div.columns {:style {:text-align "center"}}
-       [:img.nav-user-icon {:src user-icon}]]]
-     [:a.navbar-item {:href "/#"}
-      [:div.rows {:style {:text-align "center"}}
-       [:img {:src "/img/logout.svg"}]
-       [:p "logout"]]]]))
+  (let [user-name (re-frame/subscribe [::subs/uname])
+        user-icon (re-frame/subscribe [::subs/user-icon])]
+    (fn []
+      [:<>
+       [:a.navbar-item {:href (str "/users/" @user-name)}
+        [:div.container>div.columns {:style {:text-align "center"}}
+         [:img.nav-user-icon {:src @user-icon}]]]
+       [:a.navbar-item {:href "/"
+                        :on-click #(re-frame/dispatch [::auth-events/logout])}
+        [:div.rows {:style {:text-align "center"}}
+         [:img {:src "/img/logout.svg"}]
+         [:p "logout"]]]])))
 
-(def anonymous-nav
+(defn anonymous-nav []
   [:<>
    [:a.navbar-item {:href "/signup"}
     [:div.rows {:style {:text-align "center"}}
@@ -51,13 +58,15 @@
      [:img {:src "/img/login.svg"}]
      [:p "login"]]]])
 
-(defn header [login?]
-  [:nav#header.navbar.is-fixed-top.is-dark>div.container
-   {:role "navigation" :aria-label "main navigation"}
-   navbar-brand
-   [:div#navbar-menu.navbar-menu.is-dark
-    [:div.navbar-end
-     search-box
-     (if login?
-       [logined-nav]
-       anonymous-nav)]]])
+(defn header []
+  (let [login? (re-frame/subscribe [::auth-subs/login?])]
+    (fn []
+      [:nav#header.navbar.is-fixed-top.is-dark>div.container
+       {:role "navigation" :aria-label "main navigation"}
+       navbar-brand
+       [:div#navbar-menu.navbar-menu.is-dark
+        [:div.navbar-end
+         search-box
+         (if @login?
+           [logined-nav]
+           [anonymous-nav])]]])))

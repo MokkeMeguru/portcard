@@ -87,10 +87,11 @@
  ::signup-success
  (fn [cofx [_ response]]
    (let [db (-> cofx :db)
-         uname (-> response :response :name)
+         uname (-> response :uname)
          new-db (-> db
-                    (assoc :name name)
-                    (assoc :message "create-user"))]
+                    (assoc :name uname)
+                    (assoc :message "create-user")
+                    (assoc-in [:auth :login-state] :login))]
      (rfe/push-state ::routes-domain/home)
      {:db new-db
       :storage/set {:storage-type "session" :name :firebase-auth :value "success"}})))
@@ -102,6 +103,7 @@
          code (-> response :response :code)
          new-db (-> db
                     (assoc :server-code code))]
+     (js/alert response)
      (rfe/push-state  ::routes-domain/home)
      {:db new-db
       :storage/set {:storage-type "session" :name :firebase-auth :value "failed"}})))

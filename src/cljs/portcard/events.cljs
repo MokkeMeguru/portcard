@@ -24,6 +24,10 @@
  (fn [db _]
    (dissoc db :server-code)))
 
+(re-frame/reg-event-db
+ ::drop-message
+ (fn [db _]
+   (dissoc db :message)))
 
 
 ;; navigation

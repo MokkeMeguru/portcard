@@ -21,15 +21,19 @@
    (fn [e o]
      (re-frame/dispatch [::register-events/store-firebase-auth-status "wait-server-response"])
      (re-frame/dispatch [::events/initialize-firebaseui])
+     ;; this is stub ...
      (.onAuthStateChanged
       (.. js/firebase auth)
       (fn [user]
         (if user
           (.then (.getIdToken (.. js/firebase auth -currentUser) true)
                  (fn [id-token]
-                   (re-frame/dispatch [::register-events/signup id-token])))
+                   nil
+                   ;; (re-frame/dispatch [::register-events/signup id-token])
+                   ))
           ;; TODO: fine
-          (print "unknown error")))))})
+          ;; (print "unknown error")
+          ))))})
 
 (defn StyledFirebaseAuth [config]
   (let [ui-config (:ui-config config)

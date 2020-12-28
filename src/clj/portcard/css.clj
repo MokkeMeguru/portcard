@@ -32,7 +32,7 @@
      :color base-light-orange}]
    [:.fa {:color base-light-orange}]]
   [:.bd-main
-   {:padding-top "4rem"
+   {;; :padding-top "4rem"
     :min-height "100vh"
     :justify-content "center"
     :display "flex"}]
