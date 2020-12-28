@@ -19,15 +19,25 @@
      (print "initialize-firebase-ui" ui)
      (assoc db :ui ui))))
 
-(re-frame/reg-event-fx
- ::navigate
- (fn [_cofx [_ & route]]
-   {:navigate! route}))
+(re-frame/reg-event-db
+ ::drop-server-code
+ (fn [db _]
+   (dissoc db :server-code)))
+
+
+
+;; navigation
+
 
 (re-frame/reg-fx
  ::navigate!
  (fn [route]
    (apply rfe/push-state route)))
+
+(re-frame/reg-event-fx
+ ::navigate
+ (fn [_cofx [_ & route]]
+   {::navigate! route}))
 
 (re-frame/reg-event-db
  ::navigated
@@ -36,9 +46,3 @@
          controllers (rfc/apply-controllers (:controllers old-match) new-match)]
      (when-not (= new-match old-match) (.scrollTo js/window 0 0))
      (assoc db :current-route (assoc new-match :controllers controllers)))))
-
-(re-frame/reg-fx
- ::at-home
- (fn [_ _]
-   (print "at-home")
-   (set! (.. js/window -location -href) "/")))

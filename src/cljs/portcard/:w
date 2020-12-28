@@ -9,9 +9,6 @@
             [reitit.frontend :as rf]
             [portcard.events :as events]
             [re-frame.core :as re-frame]
-
-            [portcard.services.home.views :as home-views]
-
             [portcard.services.auth.views :as auth-views]
 
             [portcard.services.register.views :as register-views]
@@ -23,18 +20,24 @@
             [portcard.services.topics.views :as topics-views]
             [portcard.services.contact.views :as contact-views]))
 
+(def home-page
+  (fn []
+    (let [system-message (r/atom "create-user")]
+      (fn []
+        [:<>
+        (when-not (nil? @system-message)
+          [:div>p @system-message])
+        [:div "app-home"]]))))
+
 (def routes
   ["/"
    [""
     {:name ::routes-domain/home
-     :view  home-views/home-page
+     :view  home-page
      :link-text "app-home"
      :controllers [{:parameters {:query [:message]}
                     :start (fn [{:keys [query]}]
-                             (when-let [message (:message query)]
-                               (println query "is querys")))
-                    :stop (fn []
-                            (re-frame/dispatch [::events/drop-server-code]))}]}]
+                             (println query "is querys"))}]}]
    ["users"
     {:link-text "users"}
     ["/:id"
@@ -76,21 +79,11 @@
     {:name ::routes-domain/signup
      :controllers
      [{:start (fn [_]
-                (re-frame/dispatch [::register-events/restore-checked-uname])
                 (re-frame/dispatch [::register-events/restore-firebase-auth-status])
                 (when (= "passed"  (.getItem js/sessionStorage :firebase-auth))
                   (re-frame/dispatch [::register-events/store-firebase-auth-status "not-passed"])
                   (rfe/push-state ::routes-domain/home)
-                  (rfe/replace-state ::routes-domain/home))
-                (when (= "wait-server-response" (.getItem js/sessionStorage :firebase-auth))
-                  (.onAuthStateChanged
-                   (.. js/firebase auth)
-                   (fn [user]
-                     (if user
-                       (.then (.getIdToken (.. js/firebase auth -currentUser) true)
-                              (fn [id-token]
-                                (re-frame/dispatch [::register-events/signup id-token])))
-                       (print "unknown error"))))))}]
+                  (rfe/replace-state ::routes-domain/home)))}]
 
      :view register-views/register
      :link-text "signup"}]

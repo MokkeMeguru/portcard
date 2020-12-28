@@ -1,9 +1,7 @@
 (ns portcard.interfaces.firebaseui)
 
 (defn firebaseui-init []
-  (let [auth (.auth js/firebase)
-        _ (set! (.-languageCode auth) "ja")
-        ui  (try (new (.AuthUI (.-auth js/firebaseui)) auth)
-                 (catch js/Error e
-                   (.log js/console  e)))]
-    (.. js/firebaseui -auth -AuthUI getInstance)))
+  (if-let [ui (.. js/firebaseui -auth -AuthUI getInstance)]
+    ui
+    (let [AuthUI (.. js/firebaseui -auth -AuthUI)]
+      (AuthUI. (.. js/firebase auth)))))

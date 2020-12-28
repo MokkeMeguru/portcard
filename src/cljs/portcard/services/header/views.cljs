@@ -1,5 +1,7 @@
 (ns portcard.services.header.views
-  (:require [portcard.utils.views :refer [toggle-class]]))
+  (:require [portcard.utils.views :refer [toggle-class]]
+            [reitit.frontend.easy :as rfe]
+            [portcard.domains.routes :as routes-domain]))
 
 (defn navbar-toggle [e]
   (.preventDefault e)
@@ -8,7 +10,7 @@
 
 (def navbar-brand
   [:div.navbar-brand
-   [:a.navbar-item {:href "/#"}
+   [:a.navbar-item {:href "/"}
     [:img {:src "/img/title.svg"}]]
    [:a#navbar-burger.navbar-burger.burger
     {:role "button" :aria-label "menu" :aria-expanded "false"
@@ -40,11 +42,11 @@
 
 (def anonymous-nav
   [:<>
-   [:a.navbar-item {:href "/#/signup"}
+   [:a.navbar-item {:href "/signup"}
     [:div.rows {:style {:text-align "center"}}
      [:span.icon [:i.fa.fas.fa-angle-up.fa-2x]]
      [:p "sign up"]]]
-   [:a.navbar-item {:href "/#/login"}
+   [:a.navbar-item {:href "/login"}
     [:div.rows {:style {:text-align "center"}}
      [:img {:src "/img/login.svg"}]
      [:p "login"]]]])

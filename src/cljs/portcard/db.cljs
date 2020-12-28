@@ -7,7 +7,7 @@
    {:name "re-frame"
     :ui-config
     {:signInFlow "redirect"
-     :signInSuccessUrl "#/"
+     ;; :signInSuccessUrl "/?message=create-user"
      :signInOptions [((:google providers))]}}
 
    register-db/default-db))

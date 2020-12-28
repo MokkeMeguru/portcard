@@ -1,0 +1,5 @@
+#+TITLE: Dev docs
+* firebase ui x react の問題
+ firebase uiのコールバックでページに戻った際、基本的な状態はすべてリセットされます。
+ なので firebase ui が 何らかのトグルで did-mount <-> will-unmount されると、正常に処理が行われなくなります。
+ これを防ぐためには、 sessionStorage などに firebase ui を閉じないような記述をする必要があります。

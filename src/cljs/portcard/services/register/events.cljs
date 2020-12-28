@@ -1,7 +1,13 @@
 (ns portcard.services.register.events
   (:require [re-frame.core :as re-frame]
             [day8.re-frame.http-fx]
-            [ajax.core :as ajax]))
+            [ajax.core :as ajax]
+            [portcard.infrastructure.storage.events]
+
+            [reitit.frontend.easy :as rfe]
+            [portcard.events :as events]
+            [portcard.domains.routes :as routes-domain]
+            [reitit.frontend :as rf]))
 
 (re-frame/reg-event-db
  ::reset-register-status
@@ -14,18 +20,41 @@
    (assoc db :register-status :fail)))
 
 (re-frame/reg-event-fx
+ ::store-firebase-auth-status
+ (fn [cofx [_ status]]
+   {:storage/set {:storage-type "session" :name :firebase-auth :value status}}))
+
+(re-frame/reg-event-fx
+ ::restore-firebase-auth-status
+ [(re-frame/inject-cofx :storage/get {:storage-type "session" :name :firebase-auth})]
+ (fn [cofx _]
+   (let [db (:db cofx)
+         firebase-auth-state (:storage/get cofx)]
+     {:db (assoc-in db [:register :firebase-auth-state] firebase-auth-state)})))
+
+(re-frame/reg-event-fx
+ ::restore-checked-uname
+ [(re-frame/inject-cofx :storage/get {:storage-type "session" :name :checked-uname})]
+ (fn [cofx [_ id-token]]
+   (let [checked-uname (:storage/get cofx)
+         db (:db cofx)]
+     {:db (assoc-in db [:register :checked-uname] checked-uname)})))
+
+
+;; userid-check
+
+
+(re-frame/reg-event-fx
  ::userid-check-success
  (fn [{:keys [db]} [_ uname body]]
-   (let [new-db
-         (if (not (-> body :exist))
-           (-> db
-               (assoc-in [:register :userid-check] :success)
-               (assoc-in [:register :error-message] nil)
-               (assoc-in [:register :checked-uname] uname))
-           (-> db
-               (assoc-in [:register :userid-check] :failure)
-               (assoc-in [:register :error-message] "ユーザID が重複していました。別の ID を用いてください。")))]
-     {:db new-db})))
+   (if (-> body :exist not)
+     {:db (-> db  (assoc-in [:register :userid-check] :success)
+              (assoc-in [:register :error-message] nil)
+              (assoc-in [:register :checked-uname] uname))
+      :storage/set {:storage-type "session" :name :checked-uname :value uname}}
+     {:db   (-> db
+                (assoc-in [:register :userid-check] :failure)
+                (assoc-in [:register :error-message] "ユーザID が重複していました。別の ID を用いてください。"))})))
 
 (re-frame/reg-event-fx
  ::userid-check-failure
@@ -47,12 +76,49 @@
        :params {:uname userid}
        :format (ajax/json-request-format)
        :response-format (ajax/json-response-format {:keywords? true})
-       :handler (fn [response] (.log js/console (str response)))
        :on-success [::userid-check-success userid]
        :on-failure [::userid-check-failure]}})))
 
+
+;; signup
+
+
 (re-frame/reg-event-fx
- ::register
- (fn [cofx [_ userid]]
-   (let []
-     nil)))
+ ::signup-success
+ (fn [cofx [_ response]]
+   (let [db (-> cofx :db)
+         uname (-> response :response :name)
+         new-db (-> db
+                    (assoc :name name)
+                    (assoc :message "create-user"))]
+     (rfe/push-state ::routes-domain/home)
+     {:db new-db
+      :storage/set {:storage-type "session" :name :firebase-auth :value "success"}})))
+
+(re-frame/reg-event-fx
+ ::signup-failure
+ (fn [cofx [_ response]]
+   (let [db (-> cofx :db)
+         code (-> response :response :code)
+         new-db (-> db
+                    (assoc :server-code code))]
+     (rfe/push-state  ::routes-domain/home)
+     {:db new-db
+      :storage/set {:storage-type "session" :name :firebase-auth :value "failed"}})))
+
+(re-frame/reg-event-fx
+ ::signup
+ [(re-frame/inject-cofx :storage/get {:storage-type "session" :name :checked-uname})]
+ (fn [cofx [_ id-token]]
+   (let [{:keys [db]} cofx
+         checked-uname (:storage/get cofx)]
+     {:http-xhrio
+      {:method :post
+       :uri "http://localhost:3000/api/registration/signup"
+       :timeout 8000
+       :params {:uname (-> db :register :checked-uname)}
+       :headers {:Authorization id-token}
+       :format (ajax/json-request-format)
+       :response-format (ajax/json-response-format {:keywords? true})
+       :on-success [::signup-success]
+       :on-failure [::signup-failure]}})))

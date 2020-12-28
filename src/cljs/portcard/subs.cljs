@@ -21,3 +21,13 @@
  ::ui-config
  (fn [db]
    (:ui-config db)))
+
+(re-frame/reg-sub
+ ::message
+ (fn [db]
+   (:message db)))
+
+(re-frame/reg-sub
+ ::server-code
+ (fn [db]
+   (:server-code db)))
