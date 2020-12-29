@@ -102,8 +102,10 @@
    (let [db (-> cofx :db)
          code (-> response :response :code)
          new-db (-> db
-                    (assoc :server-code code))]
-     (js/alert response)
+                    (assoc :server-code code)
+                    (dissoc :uname)
+                    (dissoc :auth))]
+     (try (.. js/firebase auth signOut))
      (rfe/push-state  ::routes-domain/home)
      {:db new-db
       :storage/set {:storage-type "session" :name :firebase-auth :value "failed"}})))

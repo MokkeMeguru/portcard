@@ -22,7 +22,11 @@
             [portcard.domains.routes :as routes-domain]
             [portcard.services.topics.views :as topics-views]
             [portcard.services.contact.views :as contact-views]
-            [portcard.services.auth.events :as auth-events]))
+            [portcard.services.account-settings.views :as account-settings-views]
+            [portcard.services.auth.events :as auth-events]
+            [portcard.services.account-settings.events :as account-settings-events]
+            [portcard.services.card.events :as card-events]
+            [portcard.services.icon-settings.views :as icon-settings-views]))
 
 (def routes
   ["/"
@@ -49,6 +53,7 @@
       :controllers
       [{:parameters {:path [:user-id]}
         :start (fn [{:keys [path]}]
+                 (re-frame/dispatch [::card-events/load-profile (:user-id path)])
                  (println "entering user " (:user-id path) " page"))}]}]
     ;; ["/:id/topics"
     ;;  {:name ::user-topics
@@ -126,19 +131,28 @@
    ;;   :coercion reitit.coercion.spec/coercion
    ;;   :link-test "featrues page"
    ;;   :parameters {:query {:category string?}}}]
-   ;; ["settings"
-   ;;  {:name ::settings
-   ;;   :link-text "settings"
-   ;;   :controllers
-   ;;   [{:start (println "entering settings page")
-   ;;     :stop (println "leaving settings page")}]}
-   ;;  ["/account"
-   ;;   {:name ::account-settings
-   ;;    :link-text "account settings"
-   ;;    :view [:div "account setttings"]}]]
-   ])
+   ["settings"
+    {:name ::routes-domain/settings
+     :link-text "settings"
+     :controllers
+     [{:start (fn [_]
+                (re-frame/dispatch [::account-settings-events/load-profile])
+                (println "entering settings page"))
+
+       :stop (println "leaving settings page")}]}
+    ["/account"
+     {:name ::routes-domain/account-settings
+      :link-text "account settings"
+      :view account-settings-views/account-settings ;;[:div "account setttings"]
+      }]
+    ["/icon"
+     {:name ::routes-domain/icon-settings
+      :link-text "icon settings"
+      :view icon-settings-views/icon-settings}]]])
 
 (def router (rf/router routes))
+;; (rf/match-by-path router "/settings/account")
+
 
 (defn on-navigate [new-match]
   (when new-match

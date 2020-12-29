@@ -1,6 +1,7 @@
 (ns portcard.services.auth.events
   (:require
    [re-frame.core :as re-frame]
+   [day8.re-frame.http-fx]
    [portcard.services.auth.db :as auth-db]
    [portcard.infrastructure.storage.events]
    [ajax.core :as ajax]
@@ -38,8 +39,9 @@
                      (assoc-in [:auth :login-state] :login))
          new-db (if message?
                   (assoc new-db :message "login-success") new-db)]
-     (rfe/push-state ::routes-domain/home)
-     (rfe/replace-state ::routes-domain/home)
+     (when message?
+       (rfe/push-state ::routes-domain/home)
+       (rfe/replace-state ::routes-domain/home))
      {:db new-db
       :storage/set {:storage-type "session" :name :firebase-auth :value "success"}})))
 
@@ -51,6 +53,7 @@
          new-db
          (-> db
              (assoc :server-code code))]
+     (try (.. js/firebase auth signOut))
      (rfe/push-state ::routes-domain/home)
      {:db new-db
       :storage/set {:storage-type "session" :name :firebase-auth :value "failed"}})))

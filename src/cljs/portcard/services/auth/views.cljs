@@ -78,16 +78,21 @@
         (re-frame/dispatch-sync [::events/initialize-firebaseui]))
       :component-did-mount
       (fn [this]
-        (.then
-         firebaseUiDeletion
-         (do (re-frame/dispatch [::auth-events/store-firebase-auth-status "progress"])
-             (.start @firebaseUiWidget "#firebaseui-container" ui-config))))
+        (do (re-frame/dispatch [::auth-events/store-firebase-auth-status "auth-progress"])
+            (.start @firebaseUiWidget "#firebaseui-container" ui-config))
+        ;; (.then
+        ;;  firebaseUiDeletion
+        ;;  (do (re-frame/dispatch [::auth-events/store-firebase-auth-status "progress"])
+        ;;      (.start @firebaseUiWidget "#firebaseui-container" ui-config))
+        ;;  )
+        )
       :component-will-unmount
       (fn [this]
         (.reset @firebaseUiWidget)
-        (set!
-         firebaseUiDeletion
-         (.delete @firebaseUiWidget)))
+        ;; (set!
+        ;;  firebaseUiDeletion
+        ;;  (.delete @firebaseUiWidget))
+        )
       :reagent-render
       (fn [config]
         [:div#firebaseui-container])})))

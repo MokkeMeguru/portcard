@@ -1,5 +1,6 @@
 (ns portcard.db
   (:require [portcard.services.register.db :as register-db]
+            [portcard.services.account-settings.db :as account-settings-db]
             [portcard.domains.firebase :refer [providers]]))
 
 (def default-db
@@ -10,4 +11,5 @@
      ;; :signInSuccessUrl "/?message=create-user"
      :signInOptions [((:google providers))]}}
 
-   register-db/default-db))
+   register-db/default-db
+   account-settings-db/default-db))

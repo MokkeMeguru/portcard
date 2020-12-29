@@ -12,6 +12,8 @@
 (defstyles screen
   [:body {:margin 0
           :background-color base-bg}]
+  [:.level {:width "100%"}]
+
   [:#header
    {:background base-dark
     :padding "0 2rem"
@@ -195,4 +197,6 @@
   (at-media {:screen true :max-width (u/px 979)}
             [".focused-topic-title:not(.is-max-desktop):not(.is-max-widescreen)" :.topics-title
              {:margin-left "5rem"
-              :margin-right "5rem"}]))
+              :margin-right "5rem"}])
+  (at-media {:screen true :min-width (u/px 770)}
+            [:.contact-list {:padding-top "3rem"}]))

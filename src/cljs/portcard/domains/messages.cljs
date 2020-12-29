@@ -10,4 +10,7 @@
     "login-success" [:div.notification
                      [:button.delete {:on-click #(re-frame/dispatch [::events/drop-message])}]
                      "ログインに成功しました。"]
+    "account-settings-updated" [:div.notification
+                                [:button.delete {:on-click #(re-frame/dispatch [::events/drop-message])}]
+                                "更新に成功しました。"]
     nil))

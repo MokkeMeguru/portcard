@@ -14,10 +14,18 @@
    (:uname db)))
 
 (re-frame/reg-sub
+ ::user-icon-blob
+ (fn [db]
+   (if-let [blob (:icon-blob db)]
+     blob
+     (gstring/format "%s-icon.png" (:uname db)))))
+
+(re-frame/reg-sub
  ::user-icon
  :<- [::uname]
- (fn [uname db]
-   (gstring/format  "http://localhost:3000/api/user-profile/%s/icon/%s-icon.png" uname uname)))
+ :<- [::user-icon-blob]
+ (fn [[uname user-icon-blob] db]
+   (gstring/format  "http://localhost:3000/api/user-profile/%s/icon/%s" uname user-icon-blob)))
 
 (re-frame/reg-sub
  ::current-route

@@ -45,16 +45,21 @@
         (re-frame/dispatch-sync [::events/initialize-firebaseui]))
       :component-did-mount
       (fn [this]
-        (.then
-         firebaseUiDeletion
-         (do (re-frame/dispatch [::register-events/store-firebase-auth-status "progress"])
-             (.start @firebaseUiWidget "#firebaseui-container" ui-config))))
+        (do (re-frame/dispatch [::register-events/store-firebase-auth-status "progress"])
+            (.start @firebaseUiWidget "#firebaseui-container" ui-config))
+        ;; (.then
+        ;;  firebaseUiDeletion
+        ;;  (do (re-frame/dispatch [::register-events/store-firebase-auth-status "progress"])
+        ;;      (.start @firebaseUiWidget "#firebaseui-container" ui-config)))
+        )
       :component-will-unmount
       (fn [this]
         (.reset @firebaseUiWidget)
-        (set!
-         firebaseUiDeletion
-         (.delete @firebaseUiWidget)))
+        ;; (set!
+        ;;  firebaseUiDeletion
+        ;;  (.delete @firebaseUiWidget)
+        ;;  )
+        )
 
       :reagent-render
       (fn [config]
@@ -68,7 +73,7 @@
                    :class (if @userid-error "is-danger" "is-success")
                    :on-change (fn [e]
                                 (reset! userid (.. e -target -value)))}]
-    [:span.icon.is-samll.is-left [:i.fas.fa-user]]
+    [:span.icon.is-small.is-left [:i.fas.fa-user]]
     (when @userid-error
       [:p.help.is-danger "ユーザ ID は 英数字 で " users-domain/userid-min-length " ~ " users-domain/userid-max-length "文字を指定できます"])]])
 

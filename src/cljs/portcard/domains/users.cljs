@@ -64,6 +64,14 @@
   (s/and string?
          #(re-matches email-regex %)))
 
+(s/def ::twitter
+  (s/and string?
+         #(clojure.string/starts-with? % "@")))
+
+(s/def ::facebook
+  string?)
+
+
 ;; (false? (s/valid? ::username "hello "))
 ;; (true? (s/valid? ::username "hello"))
 ;; (false? (s/valid? ::userid "日本語"))

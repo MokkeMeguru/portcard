@@ -3,6 +3,10 @@ body {
   background-color: #E5E5E5;
 }
 
+.level {
+  width: 100%;
+}
+
 #header {
   background: #3A2F33;
   padding: 0 2rem;
@@ -351,6 +355,14 @@ nav .fa {
   .focused-topic-title:not(.is-max-desktop):not(.is-max-widescreen), .topics-title {
     margin-left: 5rem;
     margin-right: 5rem;
+  }
+
+}
+
+@media screen and (min-width: 770px) {
+
+  .contact-list {
+    padding-top: 3rem;
   }
 
 }
