@@ -62,17 +62,22 @@
 
 (re-frame/reg-event-fx
  ::login
+ [(re-frame/inject-cofx :storage/get {:storage-type "session" :name :firebase-auth})]
  (fn [cofx [_ {:keys [message? id-token]}]]
-   (let [{:keys [db]} cofx]
-     {:http-xhrio
-      {:method :post
-       :uri (gstring/format "%s/api/registration/signin" config/api-host)
-       :timeout 8000
-       :headers {:Authorization id-token}
-       :format (ajax/json-request-format)
-       :response-format (ajax/json-response-format {:keywords? true})
-       :on-success [::login-success message?]
-       :on-failure [::login-failure]}})))
+   (let [{:keys [db]} cofx
+         auth-status (:storage/get cofx)]
+     (cond
+       (= auth-status "wait-server-response") {}
+       :else
+       {:http-xhrio
+        {:method :post
+         :uri (gstring/format "%s/api/registration/signin" config/api-host)
+         :timeout 8000
+         :headers {:Authorization id-token}
+         :format (ajax/json-request-format)
+         :response-format (ajax/json-response-format {:keywords? true})
+         :on-success [::login-success message?]
+         :on-failure [::login-failure]}}))))
 
 ;; (defn logout [db]
 ;;   (-> db

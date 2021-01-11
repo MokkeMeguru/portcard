@@ -28,7 +28,7 @@
        {:db (assoc db :current-profile-uname uname)
         :http-xhrio
         {:method :get
-         :uri (gstring/format "%s/api/user-profile/" config/api-host uname)
+         :uri (gstring/format "%s/api/user-profile/%s" config/api-host uname)
          :timeout 8000
          :format (ajax/json-request-format)
          :response-format (ajax/json-response-format {:keywords? true})

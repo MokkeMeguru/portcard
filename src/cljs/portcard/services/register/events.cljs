@@ -91,7 +91,7 @@
    (let [db (-> cofx :db)
          uname (-> response :uname)
          new-db (-> db
-                    (assoc :name uname)
+                    (assoc :uname uname)
                     (assoc :message "create-user")
                     (assoc-in [:auth :login-state] :login))]
      (rfe/push-state ::routes-domain/home)
