@@ -1,6 +1,8 @@
 (ns portcard.services.card.subs
   (:require [re-frame.core :as re-frame]
-            [goog.string :as gstring]))
+            [goog.string :as gstring]
+            [portcard.config :as config]))
+
 (re-frame/reg-sub
  ::card
  (fn [db]
@@ -78,7 +80,7 @@
  :<- [::facebook]
  (fn [facebook _]
    (if-not (nil? facebook)
-     (gstring/format "https://www.facebook.com/" facebook))))
+     (gstring/format "https://www.facebook.com/%s" facebook))))
 
 ;; roles
 (re-frame/reg-sub
@@ -116,4 +118,4 @@
  :<- [::profile]
  (fn [[current-profile-uname profile]]
    (let [icon-blob (:icon-blob profile)]
-     (gstring/format "http://localhost:3000/api/user-profile/%s/icon/%s" current-profile-uname icon-blob))))
+     (gstring/format "%s/api/user-profile/%s/icon/%s" config/api-host current-profile-uname icon-blob))))

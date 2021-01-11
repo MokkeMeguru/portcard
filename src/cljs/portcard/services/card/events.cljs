@@ -1,7 +1,9 @@
 (ns portcard.services.card.events
   (:require [re-frame.core :as re-frame]
             [day8.re-frame.http-fx]
-            [ajax.core :as ajax]))
+            [ajax.core :as ajax]
+            [goog.string :as gstring]
+            [portcard.config :as config]))
 
 ;; load profile
 (re-frame/reg-event-fx
@@ -26,7 +28,7 @@
        {:db (assoc db :current-profile-uname uname)
         :http-xhrio
         {:method :get
-         :uri (str "http://localhost:3000/api/user-profile/" uname)
+         :uri (gstring/format "%s/api/user-profile/" config/api-host uname)
          :timeout 8000
          :format (ajax/json-request-format)
          :response-format (ajax/json-response-format {:keywords? true})

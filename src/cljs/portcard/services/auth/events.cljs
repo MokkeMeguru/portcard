@@ -6,7 +6,9 @@
    [portcard.infrastructure.storage.events]
    [ajax.core :as ajax]
    [reitit.frontend.easy :as rfe]
-   [portcard.domains.routes :as routes-domain]))
+   [portcard.domains.routes :as routes-domain]
+   [goog.string :as gstring]
+   [portcard.config :as config]))
 
 (re-frame/reg-event-fx
  ::store-firebase-auth-status
@@ -64,7 +66,7 @@
    (let [{:keys [db]} cofx]
      {:http-xhrio
       {:method :post
-       :uri "http://localhost:3000/api/registration/signin"
+       :uri (gstring/format "%s/api/registration/signin" config/api-host)
        :timeout 8000
        :headers {:Authorization id-token}
        :format (ajax/json-request-format)

@@ -139,7 +139,10 @@
                 (re-frame/dispatch [::account-settings-events/load-profile])
                 (println "entering settings page"))
 
-       :stop (println "leaving settings page")}]}
+       :stop (fn [_]
+               (println "leaving settings page")
+               (re-frame/dispatch [::events/drop-message]))}]}
+
     ["/account"
      {:name ::routes-domain/account-settings
       :link-text "account settings"

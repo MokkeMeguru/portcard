@@ -7,7 +7,9 @@
             [reitit.frontend.easy :as rfe]
             [portcard.events :as events]
             [portcard.domains.routes :as routes-domain]
-            [reitit.frontend :as rf]))
+            [reitit.frontend :as rf]
+            [goog.string :as gstring]
+            [portcard.config :as config]))
 
 (re-frame/reg-event-db
  ::reset-register-status
@@ -71,7 +73,7 @@
      {:db (assoc-in db [:register :userid-check] :pending)
       :http-xhrio
       {:method :get
-       :uri "http://localhost:3000/api/registration/check-account-name"
+       :uri (gstring/format "%s/api/registration/check-account-name" config/api-host)
        :timeout 8000
        :params {:uname userid}
        :format (ajax/json-request-format)
@@ -118,7 +120,7 @@
          checked-uname (:storage/get cofx)]
      {:http-xhrio
       {:method :post
-       :uri "http://localhost:3000/api/registration/signup"
+       :uri (gstring/format "%s/api/registration/signup" config/api-host)
        :timeout 8000
        :params {:uname (-> db :register :checked-uname)}
        :headers {:Authorization id-token}

@@ -1,7 +1,8 @@
 (ns portcard.subs
   (:require
    [re-frame.core :as re-frame]
-   [goog.string :as gstring]))
+   [goog.string :as gstring]
+   [portcard.config :as config]))
 
 (re-frame/reg-sub
  ::name
@@ -25,7 +26,7 @@
  :<- [::uname]
  :<- [::user-icon-blob]
  (fn [[uname user-icon-blob] db]
-   (gstring/format  "http://localhost:3000/api/user-profile/%s/icon/%s" uname user-icon-blob)))
+   (gstring/format  "%s/api/user-profile/%s/icon/%s" config/api-host uname user-icon-blob)))
 
 (re-frame/reg-sub
  ::current-route

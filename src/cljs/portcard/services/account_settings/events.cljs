@@ -1,6 +1,8 @@
 (ns portcard.services.account-settings.events
   (:require [re-frame.core :as re-frame]
-            [ajax.core :as ajax]))
+            [ajax.core :as ajax]
+            [goog.string :as gstring]
+            [portcard.config :as config]))
 
 (re-frame/reg-event-db
  ::append-role
@@ -67,7 +69,7 @@
        {}
        {:http-xhrio
         {:method :get
-         :uri (str "http://localhost:3000/api/user-profile/" uname)
+         :uri (gstring/format "%s/api/user-profile/%s" config/api-host uname)
          :timeout 8000
          :format (ajax/json-request-format)
          :response-format (ajax/json-response-format {:keywords? true})
@@ -103,7 +105,7 @@
      {:http-xhrio
       {:method :post
        :headers {:Authorization id-token}
-       :uri "http://localhost:3000/api/user-profile"
+       :uri (gstring/format "%s/api/user-profile" config/api-host)
        :timeout 8000
        :format (ajax/json-request-format)
        :params new-profile
