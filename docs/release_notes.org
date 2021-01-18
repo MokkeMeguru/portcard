@@ -86,16 +86,12 @@ index.html に `<link rel="stylesheet" href="css/mystyles.css">` とすること
      - interfaces
        - storage ... local storage, session storage のための event
      - services ... ページ単位のサービス実装
-       - xxx ... サービス名
+       - xxx ... サービス名 ex. main
          - db.cljs ... (optional) フォームなどの追加モデル定義
          - events.cljs ... api 呼び出し, イベントハンドラ
          - subs.cljs ... 画面読み込み
          - views.cljs ... 画面生成
      - routes.cljs ... ルーティング定義
-     - db.cljs ... メインモデル
-     - events.cljs ... エラーメッセージなどの共通のメインイベント
-     - subs.cljs ... 同上
-     - views.cljs ... 同上
      - config.cljs ... debug / release 環境の切り替えなどの config
      - core.cljs ... root
      - utils utilities
