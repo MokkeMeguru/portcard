@@ -5,7 +5,7 @@
    [reitit.frontend.easy :as rfe]
    [reitit.frontend.controllers :as rfc]
    [day8.re-frame.tracing :refer-macros [fn-traced]]
-   [portcard.interfaces.firebaseui :refer [firebaseui-init]]))
+   [portcard.infrastructure.firebase.firebaseui :refer [firebaseui-init]]))
 
 (re-frame/reg-event-db
  ::initialize-db

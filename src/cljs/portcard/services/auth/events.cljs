@@ -3,7 +3,7 @@
    [re-frame.core :as re-frame]
    [day8.re-frame.http-fx]
    [portcard.services.auth.db :as auth-db]
-   [portcard.infrastructure.storage.events]
+   [portcard.interfaces.storage.events]
    [ajax.core :as ajax]
    [reitit.frontend.easy :as rfe]
    [portcard.domains.routes :as routes-domain]

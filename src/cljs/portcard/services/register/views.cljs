@@ -7,7 +7,6 @@
             [portcard.services.register.events :as register-events]
             [portcard.domains.firebase :refer [providers]]
             [portcard.domains.routes :as routes-domain]
-            [portcard.infrastructure.storage.events]
 
             [re-frame.core :as re-frame]
             [portcard.services.main.subs :as subs]

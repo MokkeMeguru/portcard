@@ -2,7 +2,7 @@
   (:require [re-frame.core :as re-frame]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
-            [portcard.infrastructure.storage.events]
+            [portcard.interfaces.storage.events]
 
             [reitit.frontend.easy :as rfe]
             [portcard.services.main.events :as events]
