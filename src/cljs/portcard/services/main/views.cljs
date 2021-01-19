@@ -1,8 +1,8 @@
-(ns portcard.views
+(ns portcard.services.main.views
   (:require
    [re-frame.core :as re-frame]
-   [portcard.subs :as subs]
    [reagent.core :as r]
+   [portcard.services.main.subs :as subs]
    [portcard.services.header.views :as header-views]
    [portcard.domains.messages :as messages-domain]
    [portcard.domains.errors :as errors-domain]))

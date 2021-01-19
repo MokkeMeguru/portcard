@@ -10,8 +10,8 @@
             [portcard.infrastructure.storage.events]
 
             [re-frame.core :as re-frame]
-            [portcard.subs :as subs]
-            [portcard.events :as events]
+            [portcard.services.main.subs :as subs]
+            [portcard.services.main.events :as events]
             [reitit.frontend.easy :as rfe]))
 
 (defonce firebaseUiDeletion (.resolve js/Promise))

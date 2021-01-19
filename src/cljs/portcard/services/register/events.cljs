@@ -5,7 +5,7 @@
             [portcard.infrastructure.storage.events]
 
             [reitit.frontend.easy :as rfe]
-            [portcard.events :as events]
+            [portcard.services.main.events :as events]
             [portcard.domains.routes :as routes-domain]
             [reitit.frontend :as rf]
             [goog.string :as gstring]

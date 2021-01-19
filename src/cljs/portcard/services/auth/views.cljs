@@ -6,8 +6,8 @@
             [portcard.domains.users :as users-domain]
             [portcard.services.auth.subs :as auth-subs]
             [portcard.services.auth.events :as auth-events]
-            [portcard.subs :as subs]
-            [portcard.events :as events]
+            [portcard.services.main.subs :as subs]
+            [portcard.services.main.events :as events]
             [reagent.core :as r]))
 
 ;; (defn submit-field [email email-error

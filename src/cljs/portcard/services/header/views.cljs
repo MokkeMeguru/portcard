@@ -6,7 +6,7 @@
             [portcard.services.auth.events :as auth-events]
             [reagent.core :as r]
             [re-frame.core :as re-frame]
-            [portcard.subs :as subs]))
+            [portcard.services.main.subs :as subs]))
 
 (defn navbar-toggle [e]
   (.preventDefault e)

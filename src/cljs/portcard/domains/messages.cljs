@@ -1,6 +1,6 @@
 (ns portcard.domains.messages
   (:require [re-frame.core :as re-frame]
-            [portcard.events :as events]))
+            [portcard.services.main.events :as events]))
 
 (defn decode-message [key]
   (condp = key

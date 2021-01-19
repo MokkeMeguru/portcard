@@ -1,7 +1,7 @@
-(ns portcard.events
+(ns portcard.services.main.events
   (:require
    [re-frame.core :as re-frame]
-   [portcard.db :as db]
+   [portcard.services.main.db :as db]
    [reitit.frontend.easy :as rfe]
    [reitit.frontend.controllers :as rfc]
    [day8.re-frame.tracing :refer-macros [fn-traced]]

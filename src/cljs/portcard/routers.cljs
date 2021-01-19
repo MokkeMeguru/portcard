@@ -7,9 +7,10 @@
             [reagent.core :as r]
             [schema.core :as schema]
             [reitit.frontend :as rf]
-            [portcard.events :as events]
+
             [re-frame.core :as re-frame]
 
+            [portcard.services.main.events :as events]
             [portcard.services.home.views :as home-views]
 
             [portcard.services.auth.views :as auth-views]
