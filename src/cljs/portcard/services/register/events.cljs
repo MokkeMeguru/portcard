@@ -93,7 +93,7 @@
          new-db (-> db
                     (assoc :uname uname)
                     (assoc :message "create-user")
-                    (assoc-in [:auth :login-state] :login))]
+                    (assoc-in [:auth :signin-state] :signin))]
      (rfe/push-state ::routes-domain/home)
      {:db new-db
       :storage/set {:storage-type "session" :name :firebase-auth :value "success"}})))

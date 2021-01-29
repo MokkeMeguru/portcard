@@ -21,12 +21,12 @@
    (= "wait-server-response" firebase-auth-state)))
 
 (re-frame/reg-sub
- ::login-state
+ ::signin-state
  (fn [{:keys [auth]}]
-   (:login-state auth)))
+   (:signin-state auth)))
 
 (re-frame/reg-sub
- ::login?
- :<- [::login-state]
- (fn [login-state _]
-   (= login-state :login)))
+ ::signin?
+ :<- [::signin-state]
+ (fn [signin-state _]
+   (= signin-state :signin)))

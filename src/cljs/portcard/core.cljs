@@ -27,8 +27,8 @@
 
      (.then (.getIdToken (.. js/firebase auth -currentUser) true)
             (fn [id-token]
-              (re-frame/dispatch [::auth-events/login {:message? false
-                                                       :id-token id-token}]))))))
+              (re-frame/dispatch [::auth-events/signin {:message? false
+                                                        :id-token id-token}]))))))
 
 (defn init []
   (re-frame/dispatch-sync [::events/initialize-db])

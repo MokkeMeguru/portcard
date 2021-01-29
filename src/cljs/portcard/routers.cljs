@@ -1,33 +1,95 @@
 (ns portcard.routers
-  (:require [clojure.spec.alpha :as s]
-            [reitit.coercion :as coercion]
-            [reitit.coercion.spec]
-            [reitit.frontend.easy :as rfe]
+  (:require
+   ;; reitit
+   [reitit.coercion :as coercion]
+   [reitit.coercion.spec]
+   [reitit.frontend.easy :as rfe]
+   [reitit.frontend :as rf]
 
-            [reagent.core :as r]
-            [schema.core :as schema]
-            [reitit.frontend :as rf]
+   ;; others
+   [clojure.spec.alpha :as s]
+   [reagent.core :as r]
+   [schema.core :as schema]
+   [re-frame.core :as re-frame]
 
-            [re-frame.core :as re-frame]
+   ;; domain
+   [portcard.domains.routes :as routes-domain]
 
-            [portcard.services.main.events :as events]
-            [portcard.services.home.views :as home-views]
+   ;; services
+   [portcard.services.main.events :as events]
+   [portcard.services.auth.events :as auth-events]
+   [portcard.services.auth.views :as auth-views]
+   [portcard.services.home.views :as home-views]
+   [portcard.services.register.views :as register-views]
+   [portcard.services.register.events :as register-events]
+   [portcard.services.register.subs :as register-subs]
+   [portcard.services.card.events :as card-events]
+   [portcard.services.card.views :as card-views]
+   [portcard.services.topics.views :as topics-views]
+   [portcard.services.contact.views :as contact-views]
+   [portcard.services.account-settings.events :as account-settings-events]
+   [portcard.services.account-settings.views :as account-settings-views]
+   [portcard.services.icon-settings.views :as icon-settings-views]))
 
-            [portcard.services.auth.views :as auth-views]
+;; controllers
+(def home-controllers
+  [{:parameters {:query [:message]}
+    :start (fn [{:keys [query]}]
+             (when-let [message (:message query)]
+               (println query "is querys")))
+    :stop (fn []
+            (re-frame/dispatch [::events/drop-server-code]))}])
 
-            [portcard.services.register.views :as register-views]
-            [portcard.services.register.events :as register-events]
-            [portcard.services.register.subs :as register-subs]
+(def user-page-controllers
+  [{:parameters {:path [:user-id]}
+    :start (fn [{:keys [path]}]
+             (re-frame/dispatch [::card-events/load-profile (:user-id path)])
+             (println "entering user " (:user-id path) " page"))}])
 
-            [portcard.services.card.views :as card-views]
-            [portcard.domains.routes :as routes-domain]
-            [portcard.services.topics.views :as topics-views]
-            [portcard.services.contact.views :as contact-views]
-            [portcard.services.account-settings.views :as account-settings-views]
-            [portcard.services.auth.events :as auth-events]
-            [portcard.services.account-settings.events :as account-settings-events]
-            [portcard.services.card.events :as card-events]
-            [portcard.services.icon-settings.views :as icon-settings-views]))
+(def signup-controllers
+  [{:start
+    (fn [_]
+      (re-frame/dispatch [::register-events/restore-checked-uname])
+      (re-frame/dispatch [::register-events/restore-firebase-auth-status])
+      (when (= "passed"  (.getItem js/sessionStorage :firebase-auth))
+        (re-frame/dispatch [::register-events/store-firebase-auth-status "not-passed"])
+        (rfe/push-state ::routes-domain/home)
+        (rfe/replace-state ::routes-domain/home))
+      (when (= "wait-server-response" (.getItem js/sessionStorage :firebase-auth))
+        (.onAuthStateChanged
+         (.. js/firebase auth)
+         (fn [user]
+           (if user
+             (.then
+              (.getIdToken (.. js/firebase auth -currentUser) true)
+              (fn [id-token]
+                (re-frame/dispatch [::register-events/signup id-token]))))))))}])
+
+(def signin-controllers
+  [{:start
+    (fn [_]
+      (re-frame/dispatch [::auth-events/restore-firebase-auth-status])
+      (when (= "passed"  (.getItem js/sessionStorage :firebase-auth))
+        (re-frame/dispatch [::auth-events/store-firebase-auth-status "not-passed"])
+        (rfe/push-state ::routes-domain/home)
+        (rfe/replace-state ::routes-domain/home))
+      (when (= "wait-server-response" (.getItem js/sessionStorage :firebase-auth))
+        (.onAuthStateChanged
+         (.. js/firebase auth)
+         (fn [user]
+           (if user
+             (.then (.getIdToken (.. js/firebase auth -currentUser) true)
+                    (fn [id-token]
+                      (re-frame/dispatch [::auth-events/signin {:message? true
+                                                                :id-token id-token}]))))))))}])
+
+(def settings-controllers
+  [{:start (fn [_]
+             (re-frame/dispatch [::account-settings-events/load-profile])
+             (println "entering settings page"))
+    :stop (fn [_]
+            (println "leaving settings page")
+            (re-frame/dispatch [::events/drop-message]))}])
 
 (def routes
   ["/"
@@ -35,27 +97,17 @@
     {:name ::routes-domain/home
      :view  home-views/home-page
      :link-text "app-home"
-     :controllers [{:parameters {:query [:message]}
-                    :start (fn [{:keys [query]}]
-                             (when-let [message (:message query)]
-                               (println query "is querys")))
-
-                    :stop (fn []
-                            (re-frame/dispatch [::events/drop-server-code]))}]}]
+     :controllers home-controllers}]
    ["users"
     {:link-text "users"}
     ["/:user-id"
      {:name ::routes-domain/user-page
       :link-text "user page"
       :coercion reitit.coercion.spec/coercion
-      :view
-      card-views/card
+      :view card-views/card
       :parameters {:path {:user-id string?}}
-      :controllers
-      [{:parameters {:path [:user-id]}
-        :start (fn [{:keys [path]}]
-                 (re-frame/dispatch [::card-events/load-profile (:user-id path)])
-                 (println "entering user " (:user-id path) " page"))}]}]
+      :controllers user-page-controllers}]
+
     ;; ["/:id/topics"
     ;;  {:name ::user-topics
     ;;   :link-text "user topics page"
@@ -82,47 +134,26 @@
     ]
    ["signup"
     {:name ::routes-domain/signup
-     :controllers
-     [{:start (fn [_]
-                (re-frame/dispatch [::register-events/restore-checked-uname])
-                (re-frame/dispatch [::register-events/restore-firebase-auth-status])
-                (when (= "passed"  (.getItem js/sessionStorage :firebase-auth))
-                  (re-frame/dispatch [::register-events/store-firebase-auth-status "not-passed"])
-                  (rfe/push-state ::routes-domain/home)
-                  (rfe/replace-state ::routes-domain/home))
-                (when (= "wait-server-response" (.getItem js/sessionStorage :firebase-auth))
-                  (.onAuthStateChanged
-                   (.. js/firebase auth)
-                   (fn [user]
-                     (if user
-                       (.then (.getIdToken (.. js/firebase auth -currentUser) true)
-                              (fn [id-token]
-                                (re-frame/dispatch [::register-events/signup id-token])))
-                       (print "unknown error"))))))}]
-
+     :controllers signup-controllers
      :view register-views/register
      :link-text "signup"}]
-   ["login"
-    {:name ::routes-domain/login
-     :view auth-views/login
-     :link-text "login"
-     :controllers
-     [{:start (fn [_]
-                (re-frame/dispatch [::auth-events/restore-firebase-auth-status])
-                (when (= "passed"  (.getItem js/sessionStorage :firebase-auth))
-                  (re-frame/dispatch [::auth-events/store-firebase-auth-status "not-passed"])
-                  (rfe/push-state ::routes-domain/home)
-                  (rfe/replace-state ::routes-domain/home))
-                (when (= "wait-server-response" (.getItem js/sessionStorage :firebase-auth))
-                  (.onAuthStateChanged
-                   (.. js/firebase auth)
-                   (fn [user]
-                     (if user
-                       (.then (.getIdToken (.. js/firebase auth -currentUser) true)
-                              (fn [id-token]
-                                (re-frame/dispatch [::auth-events/login {:message? true
-                                                                         :id-token id-token}])))
-                       (print "unknown error"))))))}]}]
+   ["signin"
+    {:name ::routes-domain/signin
+     :view auth-views/signin
+     :link-text "signin"
+     :controllers signin-controllers}]
+   ["settings"
+    {:name ::routes-domain/settings
+     :link-text "settings"
+     :controllers settings-controllers}
+    ["/account"
+     {:name ::routes-domain/account-settings
+      :link-text "account settings"
+      :view account-settings-views/account-settings}]
+    ["/icon"
+     {:name ::routes-domain/icon-settings
+      :link-text "icon settings"
+      :view icon-settings-views/icon-settings}]]
    ;; ["new-topic"
    ;;  {:name ::new-topic
    ;;   :view [:div "post new topic"]
@@ -132,31 +163,9 @@
    ;;   :coercion reitit.coercion.spec/coercion
    ;;   :link-test "featrues page"
    ;;   :parameters {:query {:category string?}}}]
-   ["settings"
-    {:name ::routes-domain/settings
-     :link-text "settings"
-     :controllers
-     [{:start (fn [_]
-                (re-frame/dispatch [::account-settings-events/load-profile])
-                (println "entering settings page"))
-
-       :stop (fn [_]
-               (println "leaving settings page")
-               (re-frame/dispatch [::events/drop-message]))}]}
-
-    ["/account"
-     {:name ::routes-domain/account-settings
-      :link-text "account settings"
-      :view account-settings-views/account-settings ;;[:div "account setttings"]
-      }]
-    ["/icon"
-     {:name ::routes-domain/icon-settings
-      :link-text "icon settings"
-      :view icon-settings-views/icon-settings}]]])
+   ])
 
 (def router (rf/router routes))
-;; (rf/match-by-path router "/settings/account")
-
 
 (defn on-navigate [new-match]
   (when new-match
@@ -169,24 +178,21 @@
    {:use-fragment false}))
 
 
-;;(rf/match-by-path router "/")
+;; playground
+;;
+;; (rf/match-by-path router "/settings/account")
+;; (rf/match-by-path router "/")
 ;; (r/match-by-path router "/")
-
-
 ;; (rf/match-by-path router "/users/Meguru")
 ;; (r/match-by-path router "/users/hello/topics")
-
-
 ;; (r/match-by-path router "/users/hello/contact")
-
-
 ;; (r/match-by-path router "/users/hello/topics/topics-1")
 ;; (r/match-by-path router "/new-topic")
 ;; (r/match-by-path router "/features")
 ;; (r/match-by-path router "/settings/account")
 
 
-;; (r/match-by-path router "/login")
+;; (r/match-by-path router "/signin")
 
 ;; (r/match-by-name router ::user-topics {:id "Hello"})
 ;; (r/match-by-name router ::user-topics {:id "Hello"

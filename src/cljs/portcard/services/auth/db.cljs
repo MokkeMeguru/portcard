@@ -1,4 +1,4 @@
 (ns portcard.services.auth.db)
 
-(def login-status
+(def signin-status
   [:yet :ok :fail])

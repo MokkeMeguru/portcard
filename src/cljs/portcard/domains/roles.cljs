@@ -1,4 +1,97 @@
-(ns portcard.domains.roles)
+(ns portcard.domains.roles
+  (:require [clojure.spec.alpha :as s]
+            [clojure.set :as clset]))
+
+(def role-categories
+  {:programming "プログラミング"
+   :illust "イラスト"
+   :movie "映像制作"
+   :novel "小説"
+   :others "その他"})
+
+(defn imagine-role-categories [category]
+  (condp = category
+    :programming "/img/program-icon.svg"
+    :illust "/img/painting-icon.svg"
+    "/img/painting-icon.svg"))
+
+(s/def ::role-category (fn [category] (some (partial = category) (keys role-categories))))
+
+(defn unique-role [roles]
+  (apply distinct? (map #(:role-category %) roles)))
+
+(s/def ::unique-role unique-role)
+
+(s/def ::link-category-name string?)
+
+(s/def ::link-url
+  (s/and string? (partial re-matches #"^https?://[\w!\?/\+\-_~=;\.,\*&@#\$%\(\)'\[\]\u3000-\u30FE\u4E00-\u9FAF\uF900-\uFA2F\uFF01-\uFFEE]+")))
+
+(s/def ::role-link (s/keys :req-un [::link-category-name ::link-url]))
+
+(s/def ::role-links (s/coll-of ::role-link :distinct true))
+
+(s/def ::role (s/keys ::role-category ::role-links))
+
+(s/def ::roles (s/and (s/coll-of ::role :distinct true) ::unique-role))
+
+
+;; (s/explain ::role-link
+;;            {:link-category-name "Github"
+;;             :link-url "https://github.com/MeguruMokke"})
+
+;; (s/explain ::role
+;;            {:role-category :programming
+;;             :role-links
+;;             [{:link-category-name "Github"
+;;               :link-url "https://github.com/MeguruMokke"}]})
+
+;; (s/explain ::role
+;;            {:role-category :illust
+;;             :role-links
+;;             [{:link-category-name "Pixiv"
+;;               :link-url "https://pixiv.com/MeguruMokke"}]})
+
+;; (s/explain ::role
+;;            {:role-category :others
+;;             :role-links
+;;             [{:link-category-name "niconico"
+;;               :link-url "https://niconico.seiga.com/MeguruMokke"}]})
+
+
+;; (s/explain ::roles
+;;            [{:role-category :illust
+;;              :role-links
+;;              [{:link-category-name "Pixiv"
+;;                :link-url "https://pixiv.com/MeguruMokke"}]}])
+
+;; (s/explain ::roles
+;;            [{:role-category :programming
+;;              :role-links
+;;              [{:link-category-name "Github"
+;;                :link-url "https://github.com/MeguruMokke"}]}
+;;             {:role-category :illust
+;;              :role-links
+;;              [{:link-category-name "Pixiv"
+;;                :link-url "https://pixiv.com/MeguruMokke"}]}])
+
+;; (s/explain ::roles
+;;            [{:role-category :illust
+;;              :role-links
+;;              [{:link-category-name "Pixiv"
+;;                :link-url "https://pixiv.com/MeguruMokke"}]}
+;;             {:role-category :illust
+;;              :role-links
+;;              [{:link-category-name "Pixiv"
+;;                :link-url "https://pixiv.com/MeguruMokke"}]}])
+
+
+;; (s/explain ::unique-role [{:role-category :programming} {:role-category :illust}])
+;; (s/explain ::unique-role [{:role-category :programming} {:role-category :programming}])
+
+;; (s/explain ::role-category :programming)
+;; (s/explain ::role-category :some)
+
 
 (def role-cetegories
   ["---"
@@ -17,11 +110,20 @@
     "novel" "小説"
     "その他"))
 
-(defn imagine-role-categories [category]
-  (condp = category
-    "programming" "/img/program-icon.svg"
-    "illust" "/img/painting-icon.svg"
-    "/img/painting-icon.svg"))
+
+
+;; "roles": [
+;;   {
+;;     "role-category": "string",
+;;     "primary-rank": 0,
+;;     "role-links": [
+;;       {
+;;         "link-category-name": "string",
+;;         "link-url": "string"
+;;       }
+;;     ]
+;;   }
+;; ]
 
 ;; (def link-categories
 ;;   ["---"

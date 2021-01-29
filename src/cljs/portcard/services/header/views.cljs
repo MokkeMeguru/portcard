@@ -33,7 +33,7 @@
      [:input#nav-search-box.input {:placeholder "検索" :type "text"}]
      [:span.icon.is-left>i.fas.fa-search]]]])
 
-(defn logined-nav []
+(defn signined-nav []
   (let [user-name (re-frame/subscribe [::subs/uname])
         user-icon (re-frame/subscribe [::subs/user-icon])]
     (fn []
@@ -42,10 +42,10 @@
         [:div.container>div.columns {:style {:text-align "center"}}
          [:img.nav-user-icon {:src @user-icon}]]]
        [:a.navbar-item {:href "/"
-                        :on-click #(re-frame/dispatch [::auth-events/logout])}
+                        :on-click #(re-frame/dispatch [::auth-events/signout])}
         [:div.rows {:style {:text-align "center"}}
-         [:img {:src "/img/logout.svg"}]
-         [:p "logout"]]]])))
+         [:img {:src "/img/signout.svg"}]
+         [:p "signout"]]]])))
 
 (defn anonymous-nav []
   [:<>
@@ -53,13 +53,13 @@
     [:div.rows {:style {:text-align "center"}}
      [:span.icon [:i.fa.fas.fa-angle-up.fa-2x]]
      [:p "sign up"]]]
-   [:a.navbar-item {:href "/login"}
+   [:a.navbar-item {:href "/signin"}
     [:div.rows {:style {:text-align "center"}}
-     [:img {:src "/img/login.svg"}]
-     [:p "login"]]]])
+     [:img {:src "/img/signin.svg"}]
+     [:p "signin"]]]])
 
 (defn header []
-  (let [login? (re-frame/subscribe [::auth-subs/login?])]
+  (let [signin? (re-frame/subscribe [::auth-subs/signin?])]
     (fn []
       [:nav#header.navbar.is-fixed-top.is-dark>div.container
        {:role "navigation" :aria-label "main navigation"}
@@ -67,6 +67,6 @@
        [:div#navbar-menu.navbar-menu.is-dark
         [:div.navbar-end
          search-box
-         (if @login?
-           [logined-nav]
+         (if @signin?
+           [signined-nav]
            [anonymous-nav])]]])))
