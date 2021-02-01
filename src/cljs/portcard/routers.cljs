@@ -29,9 +29,12 @@
    [portcard.services.contact.views :as contact-views]
    [portcard.services.account-settings.events :as account-settings-events]
    [portcard.services.account-settings.views :as account-settings-views]
-   [portcard.services.icon-settings.views :as icon-settings-views]))
+   [portcard.services.icon-settings.views :as icon-settings-views]
+   [portcard.services.role-settings.views :as role-settings-views]))
 
 ;; controllers
+
+
 (def home-controllers
   [{:parameters {:query [:message]}
     :start (fn [{:keys [query]}]
@@ -153,7 +156,12 @@
     ["/icon"
      {:name ::routes-domain/icon-settings
       :link-text "icon settings"
-      :view icon-settings-views/icon-settings}]]
+      :view icon-settings-views/icon-settings}]
+    ["/role"
+     {:name ::routes-domain/role-settings
+      :link-text "role settings"
+      :view role-settings-views/role-settings}]]
+
    ;; ["new-topic"
    ;;  {:name ::new-topic
    ;;   :view [:div "post new topic"]

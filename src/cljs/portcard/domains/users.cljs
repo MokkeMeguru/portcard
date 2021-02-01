@@ -73,11 +73,13 @@
 ;; twitter
 (s/def ::twitter
   (s/and string?
+         #(<= 6 (count %) 16)
          #(clojure.string/starts-with? % "@")))
 
 ;; facebook
 (s/def ::facebook
-  string?)
+  (s/and string?
+         #(<= 5 (count %) 50)))
 
 ;; display-name
 (s/def ::display-name ::username)

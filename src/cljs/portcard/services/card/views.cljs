@@ -53,27 +53,28 @@
   (toggle-class "card-modal" "is-active"))
 
 (defn role-links [links]
-  [:div [:ul (map (fn [link] [:li {:key (:link-category-name link)}
-                              [:p [:span (:link-category-name link)]
-                               [:a.px-3 {:style {:text-decoration "underline"}
-                                         :href (:link-url link)} (:link-url link)]]])
-                  links)]])
+  [:div [:ul (doall (map (fn [link] [:li {:key (:link-category-name link)}
+                                     [:p [:span (:link-category-name link)]
+                                      [:a.px-3 {:style {:text-decoration "underline"}
+                                                :href (:link-url link)} (:link-url link)]]])
+                         links))]])
 
 (defn role-categories []
   (let [roles (re-frame/subscribe [::card-subs/roles])
         active-role-index (re-frame/subscribe [::card-subs/active-role-index])]
     (fn []
       [:div.columns.hobby-attribute
-       (map (fn [role]
-              [:div.column {:key (:role-category role)}
-               [:div {:style {:margin "auto"
-                              :background-color (if (= (:primary-rank role) @active-role-index)
-                                                  "#D58B50" "#AB593C")
-                              :border-radius "50%" :width "72px" :height "72px"}}
-                [:img {:src (roles-domain/imagine-role-categories (:role-category role))
-                       :style {:padding-top "12.5px"}}]]])
+       (doall
+        (map (fn [role]
+               [:div.column {:key (:role-category role)}
+                [:div {:style {:margin "auto"
+                               :background-color (if (= (:primary-rank role) @active-role-index)
+                                                   "#D58B50" "#AB593C")
+                               :border-radius "50%" :width "72px" :height "72px"}}
+                 [:img {:src (roles-domain/imagine-role-categories (:role-category role))
+                        :style {:padding-top "12.5px"}}]]])
 
-            @roles)])))
+             @roles))])))
 
 (defn card-content-bottom []
   (let [active-role-links (re-frame/subscribe [::card-subs/active-role-links])]
