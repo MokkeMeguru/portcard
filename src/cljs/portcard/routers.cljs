@@ -30,7 +30,13 @@
    [portcard.services.account-settings.events :as account-settings-events]
    [portcard.services.account-settings.views :as account-settings-views]
    [portcard.services.icon-settings.views :as icon-settings-views]
-   [portcard.services.role-settings.views :as role-settings-views]))
+   [portcard.services.role-settings.views :as role-settings-views]
+   [portcard.services.new-topic.views :as new-topic-views]
+   [portcard.services.new-topic.events :as new-topic-events]
+
+   [portcard.services.topics.events :as topics-events]
+   [portcard.services.contact.events :as contact-events]
+   [portcard.domains.topics :as topics-domain]))
 
 ;; controllers
 
@@ -47,7 +53,10 @@
   [{:parameters {:path [:user-id]}
     :start (fn [{:keys [path]}]
              (re-frame/dispatch [::card-events/load-profile (:user-id path)])
-             (println "entering user " (:user-id path) " page"))}])
+             (re-frame/dispatch [::topics-events/load-recent-topic {:uname (:user-id path) :take 1}])
+             (println "entering user " (:user-id path) " page"))
+    :stop (fn []
+            (re-frame/dispatch [::events/drop-server-code]))}])
 
 (def signup-controllers
   [{:start
@@ -94,6 +103,26 @@
             (println "leaving settings page")
             (re-frame/dispatch [::events/drop-message]))}])
 
+(def new-topic-controllers
+  [{:start (fn [_]
+             (re-frame/dispatch [::new-topic-events/initialize-new-topic]))}])
+
+(def topics-controllers
+  [{:parameters {:path [:user-id]
+                 :query [:category :from :take :order]}
+    :start (fn [{:keys [path query]}]
+             (let [uname (:user-id path)
+                   {:keys [from take order category]} query
+                   take (if (some? take) take 2)]
+               (re-frame/dispatch [::topics-events/load-recent-topic {:uname (:user-id path) :take 1}])
+               (re-frame/dispatch [::topics-events/load-topics {:uname uname :from from :take take :order order :category category}])))}])
+
+(def contact-controllers
+  [{:parameters {:path [:user-id]}
+    :start (fn [{:keys [path]}]
+             (let [uname (:user-id path)]
+               (re-frame/dispatch [::contact-events/initialize-contact uname])))}])
+
 (def routes
   ["/"
    [""
@@ -111,17 +140,16 @@
       :parameters {:path {:user-id string?}}
       :controllers user-page-controllers}]
 
-    ;; ["/:id/topics"
-    ;;  {:name ::user-topics
-    ;;   :link-text "user topics page"
-    ;;   :view topics-views/topics
-    ;;   :parameters {:path {:id string?}
-    ;;                :query {:category string?}}
-    ;;   :controllers
-    ;;   [{:parameters {:path [:id]
-    ;;                  :query [:category]}
-    ;;     :start (fn [{:keys [path query]}]
-    ;;              (println path query))}]}]
+    ["/:user-id/topics"
+     {:name ::routes-domain/user-topics
+      :link-text "user topics page"
+      :view topics-views/topics
+      :parameters {:path {:user-id string?}
+                   :query {:category string?
+                           :from int?
+                           :take int?
+                           :order string?}}
+      :controllers topics-controllers}]
     ;; ["/:id/topics/:topic-id"
     ;;  {:name ::user-topic
     ;;   :view [:div "the topic"]
@@ -129,12 +157,12 @@
     ;;   :link-text "user topic page"
     ;;   :parameters {:path {:id string?
     ;;                       :topic-id string?}}}]
-    ;; ["/:id/contact"
-    ;;  {:name ::user-contact
-    ;;   :link-text "user contact page"
-    ;;   :view contact-views/contact
-    ;;   :parameters {:path {:id string?}}}]
-    ]
+    ["/:user-id/contact"
+     {:name ::routes-domain/user-contact
+      :link-text "user contact page"
+      :view contact-views/contact
+      :parameters {:path {:user-id string?}}
+      :controllers contact-controllers}]]
    ["signup"
     {:name ::routes-domain/signup
      :controllers signup-controllers
@@ -161,11 +189,11 @@
      {:name ::routes-domain/role-settings
       :link-text "role settings"
       :view role-settings-views/role-settings}]]
-
-   ;; ["new-topic"
-   ;;  {:name ::new-topic
-   ;;   :view [:div "post new topic"]
-   ;;   :link-text "post new topic"}]
+   ["new-topic"
+    {:name ::routes-domain/new-topic
+     :link-text "post new topic"
+     :view new-topic-views/new-topic
+     :controllers new-topic-controllers}]
    ;; ["features"
    ;;  {:name ::features
    ;;   :coercion reitit.coercion.spec/coercion
@@ -175,8 +203,12 @@
 
 (def router (rf/router routes))
 
+;; (:path-params (rf/match-by-name router  ::routes-domain/user-topics {:user-id "Meguru" :category "programming"}))
+;; (:query-params (rf/match-by-path router "/users/Meguru/topics?category=programming"))
+
 (defn on-navigate [new-match]
   (when new-match
+    (re-frame/dispatch [::events/talking-to-server false])
     (re-frame/dispatch [::events/navigated new-match])))
 
 (defn init-routes! []
@@ -185,6 +217,8 @@
    on-navigate
    {:use-fragment false}))
 
+;; (rf/match-by-path router "/new-topic")
+;; (rf/match-by-path router "/users/Meguru")
 
 ;; playground
 ;;
@@ -202,7 +236,6 @@
 
 ;; (r/match-by-path router "/signin")
 
-;; (r/match-by-name router ::user-topics {:id "Hello"})
 ;; (r/match-by-name router ::user-topics {:id "Hello"
 ;;                                        :category "hey"})
 ;; (r/match-by-name router ::user-topic {:id "Hello"

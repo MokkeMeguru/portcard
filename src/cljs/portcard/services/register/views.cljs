@@ -27,9 +27,7 @@
         (if user
           (.then (.getIdToken (.. js/firebase auth -currentUser) true)
                  (fn [id-token]
-                   nil
-                   ;; (re-frame/dispatch [::register-events/signup id-token])
-                   ))
+                   (re-frame/dispatch [::register-events/signup id-token])))
           ;; TODO: fine
           ;; (print "unknown error")
           ))))})

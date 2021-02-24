@@ -29,6 +29,7 @@
    (.. js/firebase auth signOut)
    (-> db
        (assoc-in [:auth :signin-state] :signout)
+       (assoc :uname nil)
        (assoc :message nil))))
 
 (re-frame/reg-event-fx

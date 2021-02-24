@@ -52,7 +52,7 @@
             {:type "text" :placeholder "リンク先 (e.g. Github)"
              :value @role-link-name
              :on-change #(re-frame/dispatch [::role-settings-events/role-link-name idx link-idx (-> % .-target .-value)])
-             :class (if false "input is-danger" "input")}]]
+             :class (if (role-settings-valids/link-category-name-is-valid? @role-link-name) "input is-danger" "input")}]]
           (when-let [error-message (role-settings-valids/link-category-name-is-valid? @role-link-name)]
             [:p.help.is-danger error-message])]
          [:div.field
@@ -62,7 +62,7 @@
             {:type "text" :placeholder "https://somelink.com"
              :value @role-link-url
              :on-change #(re-frame/dispatch [::role-settings-events/role-link-url idx link-idx (-> % .-target .-value)])
-             :class (if false "input is-danger" "input")}]]
+             :class (if (role-settings-valids/link-url-is-valid? @role-link-url) "input is-danger" "input")}]]
           (when-let [error-message (role-settings-valids/link-url-is-valid? @role-link-url)]
             [:p.help.is-danger error-message])]]
 

@@ -37,5 +37,4 @@
 
 (defn form-is-submittable? [form]
   (when-let [problems (s/explain-data ::roles-domain/roles-update-payload form)]
-    (print problems)
     "入力に問題があります。"))

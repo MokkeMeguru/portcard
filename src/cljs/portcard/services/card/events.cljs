@@ -5,6 +5,11 @@
             [goog.string :as gstring]
             [portcard.config :as config]))
 
+(re-frame/reg-event-db
+ ::active-role-index
+ (fn [db [_ active-role-index]]
+   (assoc-in db [:card :active-role-index] active-role-index)))
+
 ;; load profile
 (re-frame/reg-event-fx
  ::load-profile-success

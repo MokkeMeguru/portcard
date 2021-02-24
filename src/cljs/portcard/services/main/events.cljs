@@ -50,3 +50,8 @@
          controllers (rfc/apply-controllers (:controllers old-match) new-match)]
      (when-not (= new-match old-match) (.scrollTo js/window 0 0))
      (assoc db :current-route (assoc new-match :controllers controllers)))))
+
+(re-frame/reg-event-db
+ ::talking-to-server
+ (fn [db [_ talking-to-server]]
+   (assoc db :talking-to-server talking-to-server)))

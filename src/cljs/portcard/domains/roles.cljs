@@ -10,7 +10,7 @@
    :others "その他"})
 
 (defn imagine-role-categories [category]
-  (condp = category
+  (condp = (keyword category)
     :programming "/img/program-icon.svg"
     :illust "/img/painting-icon.svg"
     "/img/painting-icon.svg"))

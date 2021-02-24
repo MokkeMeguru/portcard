@@ -29,9 +29,10 @@
   [:div.navbar-item
    [:div.field.has-addons
     {:style {:margin-bottom 0 :justify-content "center"}}
-    [:div.control.has-icons-left
-     [:input#nav-search-box.input {:placeholder "検索" :type "text"}]
-     [:span.icon.is-left>i.fas.fa-search]]]])
+    ;; [:div.control.has-icons-left
+    ;;  [:input#nav-search-box.input {:placeholder "検索" :type "text"}]
+    ;;  [:span.icon.is-left>i.fas.fa-search]]
+    ]])
 
 (defn signined-nav []
   (let [user-name (re-frame/subscribe [::subs/uname])

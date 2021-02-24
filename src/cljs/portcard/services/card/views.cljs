@@ -10,7 +10,8 @@
    [portcard.domains.routes :as routes-domain]
    [portcard.services.card.events :as card-events]
    [portcard.services.card.subs :as card-subs]
-   [portcard.domains.roles :as roles-domain]))
+   [portcard.domains.roles :as roles-domain]
+   [portcard.services.topics.subs :as topics-subs]))
 
 (defn contact-target [icon-src target-display target-link]
   [:li
@@ -66,7 +67,8 @@
       [:div.columns.hobby-attribute
        (doall
         (map (fn [role]
-               [:div.column {:key (:role-category role)}
+               [:div.column {:key (:role-category role)
+                             :on-click (fn [e] (re-frame/dispatch [::card-events/active-role-index (:primary-rank role)]))}
                 [:div {:style {:margin "auto"
                                :background-color (if (= (:primary-rank role) @active-role-index)
                                                    "#D58B50" "#AB593C")
@@ -101,37 +103,54 @@
    [card-content-bottom]])
 
 (defn card-contact []
-  (let [my-profile? (re-frame/subscribe [::card-subs/my-profile?])]
+  (let [my-profile? (re-frame/subscribe [::card-subs/my-profile?])
+        user-name (re-frame/subscribe [::card-subs/current-profile-uname])]
     (fn []
       [:div#card-contact.column
        [:div.container
-        [:div.columns.has-text-right
-         [:div.column.is-9]
+        [:div.columns.has-text-right {:style {:justify-content "flex-end"}}
          (if @my-profile?
            [:<>
-            [:div.column.is-2 [:button.button.card-button {:on-click (fn [e]
-                                                                       (rfe/push-state ::routes-domain/account-settings)
-                                                                       (rfe/replace-state ::routes-domain/account-settings))} [:i.fas.fa-wrench] [:span "プロフィール設定"]]]]
+            [:div.column {:style {:flex-grow 0}}
+             [:button.button.card-button
+              {:on-click (fn [e]
+                           (rfe/push-state ::routes-domain/account-settings)
+                           (rfe/replace-state ::routes-domain/account-settings))} [:i.fas.fa-wrench] [:span "プロフィール設定"]]]
+            [:div.column {:style {:flex-grow 0}}
+             [:button.button.card-button
+              {:on-click (fn [e]
+                           (rfe/push-state ::routes-domain/new-topic)
+                           (rfe/replace-state ::routes-domain/new-topic))} [:i.fas.fa-arrow-right] [:span "トピックの投稿"]]]]
            [:<>
             [:div.column.is-1 [:button.card-button.button {:disabled true} [:img {:src "/img/user-add-icon.svg" :title "follow"}]]]
-            [:div.column.is-2 [:button.button.card-button {:disabled true} [:i.fas.fa-arrow-right] [:span "contact"]]]])]]
+            [:div.column.is-2
+             [:a.button.card-button
+              {:href (rfe/href ::routes-domain/user-contact {:user-id @user-name})}
+              [:i.fas.fa-arrow-right] [:span "contact"]]]])]]
        [:hr {:style {:height "0.2em"
                      :background-color "rgba(58, 47, 51, 0.20)"}}]])))
+;; (defn focused-topic []
+;;   (let [focused-topic (reagent/atom {:id 1
+;;                                      :title "hello"
+;;                                      :date "2020/02/01"
+;;                                      :screenshot "/img/sample-user-icon.png"
+;;                                      :description "sample description"
+;;                                      :link "https://www.google.com/"
+;;                                      :category :illust
+;;                                      :category-icon "/img/painting-icon.svg"})]
+;;     (fn []
+;;       [topic @focused-topic])))
 
-(defn focused-topic []
-  (let [focused-topic (reagent/atom {:id 1
-                                     :title "hello"
-                                     :date "2020/02/01"
-                                     :screenshot "/img/sample-user-icon.png"
-                                     :description "sample description"
-                                     :link "https://www.google.com/"
-                                     :category :illust
-                                     :category-icon "/img/painting-icon.svg"})]
+(defn recent-topics []
+  (let [recent-topics (re-frame/subscribe [::topics-subs/recent-topics])]
     (fn []
-      [topic @focused-topic])))
+      [:<>
+       (map  (fn [item] ^{:key (:uid item)} [topic item]) @recent-topics)])))
 
 (defn card-main []
-  (let [profile-exist? (re-frame/subscribe [::card-subs/profile-exist?])]
+  (let [profile-exist? (re-frame/subscribe [::card-subs/profile-exist?])
+        user-name (re-frame/subscribe [::card-subs/current-profile-uname])
+        recent-topics-exist? (re-frame/subscribe [::topics-subs/recent-topics-exist?])]
     (fn []
       (if-not @profile-exist?
         [:<>
@@ -151,12 +170,15 @@
             [:div.columns.is-centered {:style {:margin "0 2rem"}}
              [card-body true]]]]]
          [card-contact]
-        ;; [:div.focused-topic-title
-        ;;  [:h1.title "Focused Topic"]]
-        ;; [focused-topic]
-        ;; [:div.focused-topic-title {:style {:text-align "right"}}
-        ;;  [:h1.title [:button.button.card-button  "Other Topics →"]]]
-         ]))))
+         (when @recent-topics-exist?
+           [:<>
+            [:div.focused-topic-title
+             [:h1.title "Recent Topic"]]
+            [recent-topics]
+            [:div.focused-topic-title {:style {:text-align "right"}}
+             [:h1.title [:a.button.card-button
+                         {:href (rfe/href ::routes-domain/user-topics {:user-id @user-name})}
+                         "Other Topics →"]]]])]))))
 
 (def card
   [card-main])

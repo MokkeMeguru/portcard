@@ -2,7 +2,7 @@
   (:require [reagent.core :as reagent]
             [clojure.spec.alpha :as s]
             [re-frame.core :as re-frame]
-            [portcard.services.common.views :refer [email-field password-field]]
+            ;; [portcard.services.common.views :refer [email-field password-field]]
             [portcard.domains.users :as users-domain]
             [portcard.services.auth.subs :as auth-subs]
             [portcard.services.auth.events :as auth-events]
@@ -10,48 +10,6 @@
             [portcard.services.main.events :as events]
             [reagent.core :as r]))
 
-;; (defn submit-field [email email-error
-;;                     password password-error
-;;                     submitted]
-;;   [:div.field
-;;    [:div.control.form
-;;     (if true
-;;       [:button.button.is-primary
-;;        {:on-click
-;;         (fn [e]
-;;           (.preventDefault e)
-;;           (reset! email-error (not (s/valid? ::users-domain/email @email)))
-;;           (reset! password-error (not (s/valid? ::users-domain/password @password)))
-;;           (when (and (not @email-error)
-;;                      (not @password-error))
-;;             (print "signined")
-;;             (re-frame/dispatch [::auth-events/signin-failed])
-;;             (reset! submitted true)))}
-;;        "submit"]
-;;       [:button.button.is-primary.is-loading "submitting..."])]])
-
-;; (def signin-failure
-;;   [:div.notification.is-danger
-;;    [:button.delete {:on-click #(re-frame/dispatch [::auth-events/reset-signin-status])}]
-;;    [:p "ログイン に失敗しました。メールアドレスかパスワードが異なっています。"]])
-
-;; (defn signin-body []
-;;   (let [email (reagent/atom "")
-;;         password (reagent/atom "")
-;;         email-error (reagent/atom nil)
-;;         password-error (reagent/atom nil)
-;;         submitted (reagent/atom nil)
-;;         signin-success? (re-frame/subscribe [::auth-subs/signin-success?])]
-;;     (fn []
-;;       [:div.container
-;;        (when-not @signin-success?
-;;          signin-failure)
-;;        [email-field email email-error]
-;;        [password-field password password-error]
-;;        [submit-field
-;;         email email-error
-;;         password password-error
-;;         submitted]])))
 (defonce firebaseUiDeletion (.resolve js/Promise))
 
 (def ui-config-callbacks
