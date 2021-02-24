@@ -1,11 +1,11 @@
-(ns portcard.events
+(ns portcard.services.main.events
   (:require
    [re-frame.core :as re-frame]
-   [portcard.db :as db]
+   [portcard.services.main.db :as db]
    [reitit.frontend.easy :as rfe]
    [reitit.frontend.controllers :as rfc]
    [day8.re-frame.tracing :refer-macros [fn-traced]]
-   [portcard.interfaces.firebaseui :refer [firebaseui-init]]))
+   [portcard.infrastructure.firebase.firebaseui :refer [firebaseui-init]]))
 
 (re-frame/reg-event-db
  ::initialize-db
@@ -50,3 +50,8 @@
          controllers (rfc/apply-controllers (:controllers old-match) new-match)]
      (when-not (= new-match old-match) (.scrollTo js/window 0 0))
      (assoc db :current-route (assoc new-match :controllers controllers)))))
+
+(re-frame/reg-event-db
+ ::talking-to-server
+ (fn [db [_ talking-to-server]]
+   (assoc db :talking-to-server talking-to-server)))

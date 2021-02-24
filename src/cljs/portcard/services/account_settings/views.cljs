@@ -6,188 +6,137 @@
             [portcard.domains.roles :as roles-domain]
             [portcard.services.account-settings.events :as account-settings-events]
             [portcard.services.account-settings.subs :as account-settings-subs]
+            [portcard.services.account-settings.valids :as account-settings-valids]
             [clojure.spec.alpha :as s]
             [reitit.frontend.easy :as rfe]
             [portcard.domains.routes :as routes-domain]))
 
-(defn email-field []
-  (let [email-error (r/atom nil)
-        email (re-frame/subscribe [::account-settings-subs/email])]
-    [:div.field
-     [:label "メールアドレス (任意)"]
-     [:div.control.has-icons-left
-      [:input.input {:type "email" :placeholder "address@xxx.xxx"
-                     :class (if @email-error "is-danger" "is-success")
-                     :value @email
-                     :on-change (fn [e]
-                                  (let [new-email (.. e -target -value)]
-                                    (re-frame/dispatch-sync [::account-settings-events/email new-email])
-                                    (reset! email-error (not (s/valid? ::users-domain/email new-email)))))}]
-      [:span.icon.is-left
-       [:i.fas.fa-envelope.fa-xs]]]]))
-
-(defn twitter-field []
-  (let [twitter-error (r/atom nil)
-        twitter (re-frame/subscribe [::account-settings-subs/twitter])]
-    [:div.field
-     [:label "Twitter (任意)"]
-
-     [:div.control.has-icons-left
-      [:input.input {:type "text" :placeholder "xxx"
-                     :value @twitter
-                     :class (if @twitter-error "is-danger" "is-success")
-                     :on-change (fn [e]
-                                  (let [new-twitter (.. e -target -value)]
-                                    (re-frame/dispatch-sync [::account-settings-events/twitter new-twitter])
-                                    (reset! twitter-error (not (s/valid? ::users-domain/twitter new-twitter)))))}]
-      [:span.icon.is-left
-       [:i.fab.fa-twitter]]]]))
-
-(defn facebook-field []
-  (let [facebook-error (r/atom nil)
-        facebook (re-frame/subscribe [::account-settings-subs/facebook])]
-    [:div.field
-     [:label "facebook (任意)"]
-
-     [:div.control.has-icons-left
-      [:input.input {:type "text" :placeholder "xxx"
-                     :value @facebook
-                     :class (if @facebook-error "is-danger" "is-success")
-                     :on-change (fn [e]
-                                  (let [new-facebook (.. e -target -value)]
-                                    (re-frame/dispatch-sync [::account-settings-events/facebook new-facebook])
-                                    (reset! facebook-error (not (s/valid? ::users-domain/facebook new-facebook)))))}]
-      [:span.icon.is-left
-       [:i.fab.fa-facebook]]]]))
-
 (defn display-name-field []
-  (let [display-name-error (r/atom nil)
-        display-name (re-frame/subscribe [::account-settings-subs/display-name])]
+  (let [display-name (re-frame/subscribe [::account-settings-subs/display-name])]
     (fn []
       [:div.field
        [:label "ユーザ名 (表示名)"]
        [:div.control.has-icons-left
-        [:input.input {:type "text" :placeholder "ユーザ名 (ひらがな/漢字可)"
-                       :class (if @display-name-error "is-danger" "is-success")
-                       :on-change (fn [e]
-                                    (let [new-display-name (.. e -target -value)]
-                                      (re-frame/dispatch-sync [::account-settings-events/display-name new-display-name])
-                                      (reset! display-name-error (not (s/valid? ::users-domain/username new-display-name)))))
-                       :value @display-name}]
+        [:input
+         {:type "text" :placeholder "ユーザ名 (ひらがな / 漢字 可)"
+          :class (if (account-settings-valids/display-name-is-valid? @display-name) "input is-danger" "input")
+          :value @display-name
+          :on-change #(re-frame/dispatch [::account-settings-events/display-name (-> % .-target .-value)])}]
         [:span.icon.is-small.is-left [:i.fas.fa-user]]
-        (when @display-name-error
-          [:p.help.is-danger "ユーザ名 は ひらがな / 漢字 / 英数字 で" users-domain/username-min-length " ~ " users-domain/username-max-length "文字を指定できます。"])]])))
-
-(defn link-field []
-  (let []
-    (fn []
-      [:div.form
-       [:div.control
-        [:input.input {:type "text" :placeholder "リンク先 (Github)"
-                       :class "is-success"}]]
-       [:div.control.has-icons-left
-        [:input.input {:type "text" :placeholder "https://xxx.xxx (任意)"
-                       :class "is-success"}]
-        [:span.icon.is-small.is-left [:i.fas.fa-link]]]])))
-
-(defn links-field []
-  [:div.control
-   [link-field]])
-
-(defn category-field [index]
-  [:div.control
-   [:div.select {:class "is-danger"}
-    [:select
-     (map (fn [category] [:option (roles-domain/decode-role-categories category)]) roles-domain/role-cetegories)]]])
+        (when-let [error-message (account-settings-valids/display-name-is-valid? @display-name)]
+          [:p.help.is-danger error-message])]])))
 
 (defn display-name-settings []
   (fn []
-    [display-name-field]))
+    [:<>
+     [display-name-field]]))
 
-(defn contact-settings [contact]
-  (let [email (r/atom "")
-        email-error (r/atom nil)
-        twitter (r/atom "")
-        twitter-error (r/atom nil)
-        facebook (r/atom "")
-        facebook-error (r/atom nil)]
+(defn email-field []
+  (let [email (re-frame/subscribe [::account-settings-subs/email])]
     (fn []
-      [:<>
-       [:div>p.subtitle.pb-3 "連絡先"]
-       [email-field]
-       [twitter-field]
-       [facebook-field]])))
+      [:div.field
+       [:label "メールアドレス (任意)"]
+       [:div.control.has-icons-left
+        [:input
+         {:type "text" :placeholder "address@xxx.com"
+          :class (if (account-settings-valids/email-is-valid? @email) "input is-danger" "input")
+          :value @email
+          :on-change #(re-frame/dispatch [::account-settings-events/email (-> % .-target .-value)])}]
+        [:span.icon.is-left [:i.fas.fa-envelope.fa-xs]]
+        (when-let [error-message (account-settings-valids/email-is-valid? @email)]
+          [:p.help.is-danger error-message])]])))
 
-(defn role [[index x]]
+(defn twitter-field []
+  (let [twitter (re-frame/subscribe [::account-settings-subs/twitter])]
+    (fn []
+      [:div.field
+       [:label "Twitter (任意)"]
+       [:div.control.has-icons-left
+        [:input
+         {:type "text" :placeholder "@xxxxx"
+          :class (if (account-settings-valids/twitter-is-valid? @twitter) "input is-danger" "input")
+          :value @twitter
+          :on-change #(re-frame/dispatch [::account-settings-events/twitter (-> % .-target .-value)])}]
+
+        [:span.icon.is-left [:i.fab.fa-twitter]]
+        (when-let [error-message (account-settings-valids/twitter-is-valid? @twitter)]
+          [:p.help.is-danger error-message])]])))
+
+(defn facebook-field []
+  (let [facebook (re-frame/subscribe [::account-settings-subs/facebook])]
+    (fn []
+      [:div.field
+       [:label "facebook (任意)"]
+       [:div.control.has-icons-left
+        [:input
+         {:type "text" :placeholder "xxxxx"
+          :class (if (account-settings-valids/facebook-is-valid? @facebook) "input is-danger" "input")
+          :value @facebook
+          :on-change #(re-frame/dispatch [::account-settings-events/facebook (-> % .-target .-value)])}]
+        [:span.icon.is-left [:i.fab.fa-facebook]]
+        (when-let [error-message (account-settings-valids/facebook-is-valid? @facebook)]
+          [:p.help.is-danger error-message])]])))
+
+(defn contact-settings []
   (fn []
     [:<>
-     [:div.level.is-mobile
-      [:div.level-left [:span.pr-5 "所属カテゴリ " (gstring/format "(%d)"  (inc index))]]
-      (when-not (zero? index)
-        [:div.lebel-right
-         [:span.icon.is-small
-          {:on-click (fn [e]
-                       (re-frame/dispatch [::account-settings-events/remove-role]))}
-          [:i.fas.fa-fw.fa-trash]]])]
-     [:div.field
-      [:label "カテゴリ"]
-      [category-field index]]
-     [:div.field
-      [:label "リンク"]
-      [links-field]]]))
-
-(defn roles-settings [roles]
-  (fn []
-    [:<>
-     [:div [:p.subtitle.pb-3 "カテゴリ"]]
-     [:div (map (fn [role-item] [role role-item]) (map-indexed vector (if (zero? (count @roles)) [{}] @roles)))]
-    ;; (when (< (count @roles) 3)
-    ;;   [:div.pt-5
-    ;;    [:button.card-button.button
-    ;;     {:on-click #(re-frame/dispatch [::account-settings-events/append-role])} "カテゴリを追加"]])
-     ]))
+     [:div>p.subtitle.pb-3 "連絡先"]
+     [email-field]
+     [twitter-field]
+     [facebook-field]]))
 
 (defn submit-field []
-  (fn []
-    [:div.field
-     [:div.control.form
-      [:button.button.is-primary
-       {:on-click
-        (fn [e]
-          (.preventDefault e)
-          (.then
-           (.getIdToken (.. js/firebase auth -currentUser) true)
-           (fn [id-token]
-             (re-frame/dispatch [::account-settings-events/update-profile {:id-token id-token}]))))}
-       "更新"]]]))
+  (let [payload-form (re-frame/subscribe [::account-settings-subs/payload-form])]
+    (fn []
+      [:div.field>div.control.form
+       [:button.button.card-button
+        {:disabled (-> (account-settings-valids/form-is-submittable? @payload-form) empty? not)
+         :on-click
+         (fn [e]
+           (.preventDefault e)
+           (.then
+            (.getIdToken (.. js/firebase auth -currentUser) true)
+            (fn [id-token]
+              (re-frame/dispatch [::account-settings-events/update-profile {:id-token id-token :payload @payload-form}]))))}
+        "更新"]
+       (when-let [error-message (account-settings-valids/form-is-submittable? @payload-form)]
+         [:p.help.is-danger error-message])])))
+
+(def reload-account-settings-body
+  [:div.container
+   [:p.subtitle "アカウント情報を読み込み中です。しばらくお待ちください。"]
+   [:button.button.card-button
+    {:on-click #(re-frame/dispatch-sync [::account-settings-events/load-profile])}
+    "再読込み"]])
+
+(def main-account-settings-body
+  [:<>
+   [:<>
+    [:button.button.card-button
+     {:on-click #(re-frame/dispatch-sync [::account-settings-events/restore-own-profile])}
+     "以前の設定の読み込み"]
+    [:button.button.card-button
+     {:on-click #(do (rfe/push-state ::routes-domain/icon-settings)
+                     (rfe/replace-state ::routes-domain/icon-settings))}
+     "アイコンの設定"]
+    [:button.button.card-button
+     {:on-click #(do (rfe/push-state ::routes-domain/role-settings)
+                     (rfe/replace-state ::routes-domain/role-settings))}
+
+     "趣味 / 職業の設定"]]
+   [:hr]
+   [display-name-settings]
+   [:hr]
+   [contact-settings]
+   [:hr]
+   [submit-field]])
 
 (defn account-settings-body []
-  (let [roles (re-frame/subscribe [::account-settings-subs/roles])
-        contact (r/atom {:email nil :twitter nil :facebook nil})
-        display-name (re-frame/subscribe [::account-settings-subs/display-name])
-        own-profile-loaded? (re-frame/subscribe [::account-settings-subs/own-profile-loaded?])]
+  (let [own-profile-loaded? (re-frame/subscribe [::account-settings-subs/own-profile-loaded?])]
     (fn []
-      (if @own-profile-loaded?
-        [:div.container
-         [:p.subtitle "アカウント情報を読み込み中です。しばらくお待ちください。"]
-         [:button.button.card-button
-          {:on-click #(re-frame/dispatch-sync [::account-settings-events/load-profile])}
-          "再読込み"]]
-        [:<>
-         [:<>
-          [:button.button.card-button
-           {:on-click #(re-frame/dispatch-sync [::account-settings-events/restore-own-profile])} "以前の設定の読み込み"]
-          [:button.button.card-button
-           {:on-click #(do (rfe/push-state ::routes-domain/icon-settings)
-                           (rfe/replace-state ::routes-domain/icon-settings))}
-           "アイコンの設定"]]
-         [:hr]
-         [display-name-settings display-name]
-         [:hr]
-         [contact-settings contact]
-         [:hr]
-         ;; [roles-settings roles]
-         [submit-field]]))))
+      (if-not @own-profile-loaded?
+        reload-account-settings-body
+        main-account-settings-body))))
 
 (def account-settings-content
   {:title "アカウントの設定"

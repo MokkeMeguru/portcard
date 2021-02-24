@@ -72,6 +72,7 @@
      :right "0.2rem"}]
    [:.card-icon
     {:max-width "256px" :min-width "128px"
+     :max-height "256px" :min-height "128px"
      :border-radius "50%"
      :border "solid 0.15rem #52474F"}]]
   [:#card-body

@@ -1,8 +1,8 @@
-(ns portcard.views
+(ns portcard.services.main.views
   (:require
    [re-frame.core :as re-frame]
-   [portcard.subs :as subs]
    [reagent.core :as r]
+   [portcard.services.main.subs :as subs]
    [portcard.services.header.views :as header-views]
    [portcard.domains.messages :as messages-domain]
    [portcard.domains.errors :as errors-domain]))
@@ -13,7 +13,7 @@
     (fn []
       (print "server-code is " @server-code)
       (cond
-        (-> @server-code nil? not) [:div {:style {:padding-top "5rem"}} (errors-domain/decode-server-error @server-code)]
+        (-> @server-code nil? not) [:div {:style {:padding-top "4.5rem"}} (errors-domain/decode-server-error @server-code)]
         (-> @system-message nil? not) [:div {:style {:padding-top "5rem"}} (messages-domain/decode-message @system-message)]
         :else
         [:div {:style {:padding-top "5rem"}}]))))

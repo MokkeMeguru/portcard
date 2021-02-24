@@ -5,20 +5,6 @@
             [portcard.config :as config]))
 
 (re-frame/reg-event-db
- ::append-role
- (fn [db _]
-   (let [roles (-> db :account-settings :roles)
-         new-roles (conj roles {})]
-     (assoc-in db [:account-settings :roles] new-roles))))
-
-(re-frame/reg-event-db
- ::remove-role
- (fn [db _]
-   (let [roles (-> db :account-settings :roles)
-         new-roles (pop roles)]
-     (assoc-in db [:account-settings :roles] new-roles))))
-
-(re-frame/reg-event-db
  ::restore-own-profile
  (fn [db _]
    (let [own-profile (:own-profile db)]
@@ -45,15 +31,30 @@
    (assoc-in db [:edit-profile :contact :facebook] facebook)))
 
 ;; load profile
+(defn ->roles [roles]
+  (mapv
+   (fn [role]
+     (assoc role :role-category (-> role :role-category keyword)))
+   (sort-by :primary-rank roles)))
+
+(defn ->profile [response]
+  (let [display-name (:display-name response)
+        contact (:contact response)
+        roles (:roles response)]
+    {:display-name display-name
+     :contact contact
+     :roles (->roles roles)}))
+
 (re-frame/reg-event-fx
  ::load-profile-success
  (fn [cofx [_ response]]
-   (let [db (:db cofx)]
+   (let [db (:db cofx)
+         profile (->profile response)]
      {:db (-> db
               (assoc
-               :own-profile response)
+               :own-profile profile)
               (assoc
-               :edit-profile response))})))
+               :edit-profile profile))})))
 
 (re-frame/reg-event-fx
  ::load-profile-failure
@@ -88,7 +89,6 @@
 (re-frame/reg-event-fx
  ::update-profile-failure
  (fn [cofx [_ response]]
-
    (print "update failed")
    (print "response" response)
    (let [db (-> cofx :db)
@@ -99,9 +99,9 @@
 
 (re-frame/reg-event-fx
  ::update-profile
- (fn [cofx [_ {:keys [id-token]}]]
+ (fn [cofx [_ {:keys [id-token payload]}]]
    (let [{:keys [db]} cofx
-         new-profile (:edit-profile db)]
+         new-profile payload]
      {:http-xhrio
       {:method :post
        :headers {:Authorization id-token}

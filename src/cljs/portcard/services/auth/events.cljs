@@ -3,7 +3,7 @@
    [re-frame.core :as re-frame]
    [day8.re-frame.http-fx]
    [portcard.services.auth.db :as auth-db]
-   [portcard.infrastructure.storage.events]
+   [portcard.interfaces.storage.events]
    [ajax.core :as ajax]
    [reitit.frontend.easy :as rfe]
    [portcard.domains.routes :as routes-domain]
@@ -24,23 +24,24 @@
      {:db (assoc-in db [:auth :firebase-auth-state] firebase-auth-state)})))
 
 (re-frame/reg-event-db
- ::logout
+ ::signout
  (fn [db [_]]
    (.. js/firebase auth signOut)
    (-> db
-       (assoc-in [:auth :login-state] :logout)
+       (assoc-in [:auth :signin-state] :signout)
+       (assoc :uname nil)
        (assoc :message nil))))
 
 (re-frame/reg-event-fx
- ::login-success
+ ::signin-success
  (fn [cofx [_ message? response]]
    (let [db (-> cofx :db)
          uname (-> response  :uname)
          new-db  (-> db
                      (assoc :uname uname)
-                     (assoc-in [:auth :login-state] :login))
+                     (assoc-in [:auth :signin-state] :signin))
          new-db (if message?
-                  (assoc new-db :message "login-success") new-db)]
+                  (assoc new-db :message "signin-success") new-db)]
      (when message?
        (rfe/push-state ::routes-domain/home)
        (rfe/replace-state ::routes-domain/home))
@@ -48,7 +49,7 @@
       :storage/set {:storage-type "session" :name :firebase-auth :value "success"}})))
 
 (re-frame/reg-event-fx
- ::login-failure
+ ::signin-failure
  (fn [cofx [_ response]]
    (let [db (-> cofx :db)
          code (-> response :response :code)
@@ -61,7 +62,7 @@
       :storage/set {:storage-type "session" :name :firebase-auth :value "failed"}})))
 
 (re-frame/reg-event-fx
- ::login
+ ::signin
  [(re-frame/inject-cofx :storage/get {:storage-type "session" :name :firebase-auth})]
  (fn [cofx [_ {:keys [message? id-token]}]]
    (let [{:keys [db]} cofx
@@ -76,30 +77,30 @@
          :headers {:Authorization id-token}
          :format (ajax/json-request-format)
          :response-format (ajax/json-response-format {:keywords? true})
-         :on-success [::login-success message?]
-         :on-failure [::login-failure]}}))))
+         :on-success [::signin-success message?]
+         :on-failure [::signin-failure]}}))))
 
-;; (defn logout [db]
+;; (defn signout [db]
 ;;   (-> db
-;;       (assoc :login? false)
-;;       (assoc :login-info {})))
+;;       (assoc :signin? false)
+;;       (assoc :signin-info {})))
 
 ;; (re-frame/reg-event-db
-;;  ::logout
+;;  ::signout
 ;;  (fn [db [_]]
-;;    (logout db)))
+;;    (signout db)))
 
 ;; (re-frame/reg-event-fx
-;;  ::login
+;;  ::signin
 ;;  (fn [{:keys [db]}]
 ;;    nil))
 
 ;; (re-frame/reg-event-db
-;;  ::reset-login-status
+;;  ::reset-signin-status
 ;;  (fn [db [_]]
-;;    (assoc db :login-status :yet)))
+;;    (assoc db :signin-status :yet)))
 
 ;; (re-frame/reg-event-db
-;;  ::login-failed
+;;  ::signin-failed
 ;;  (fn [db [_]]
-;;    (assoc db :login-status :fail)))
+;;    (assoc db :signin-status :fail)))

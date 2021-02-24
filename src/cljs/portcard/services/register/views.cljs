@@ -7,11 +7,10 @@
             [portcard.services.register.events :as register-events]
             [portcard.domains.firebase :refer [providers]]
             [portcard.domains.routes :as routes-domain]
-            [portcard.infrastructure.storage.events]
 
             [re-frame.core :as re-frame]
-            [portcard.subs :as subs]
-            [portcard.events :as events]
+            [portcard.services.main.subs :as subs]
+            [portcard.services.main.events :as events]
             [reitit.frontend.easy :as rfe]))
 
 (defonce firebaseUiDeletion (.resolve js/Promise))
@@ -28,9 +27,7 @@
         (if user
           (.then (.getIdToken (.. js/firebase auth -currentUser) true)
                  (fn [id-token]
-                   nil
-                   ;; (re-frame/dispatch [::register-events/signup id-token])
-                   ))
+                   (re-frame/dispatch [::register-events/signup id-token])))
           ;; TODO: fine
           ;; (print "unknown error")
           ))))})

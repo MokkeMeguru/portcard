@@ -102,14 +102,14 @@
  :<- [::roles]
  :<- [::active-role-index]
  (fn [[roles active-role-index] _]
-   (if-let [active-role (first (filter #(= (:primary-link %) active-role-index) roles))]
+   (if-let [active-role (first (filter #(= (:primary-rank %) active-role-index) roles))]
      active-role
      (first roles))))
 
 (re-frame/reg-sub
  ::active-role-links
  :<- [::active-role]
- (fn [active-role _]
+ (fn [active-role]
    (:role-links active-role)))
 
 (re-frame/reg-sub

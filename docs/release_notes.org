@@ -1,0 +1,117 @@
+#+TITLE: Release Memo
+* 0th Release Memo
+** アプリの初期化
+re-frame テンプレートを使ってアプリの初期設定を行う.
+
+#+BEGIN_SRC shell
+lein new re-frame <project-name> +garden +10x +cider +test
+#+END_SRC
+
+追加したオプションは次の通り
+- garden: clojure で css を書くライブラリの追加
+- 10x: デバッグツールの追加
+- cider: emacs での開発支援ツールの追加
+- test: テストのテンプレートの追加
+** 追加した便利な外部ライブラリ
+*** ルーティング
+SPA のルーティングのためのライブラリ。速度, ドキュメントの面で充実している
+- [metosin/reitit "0.5.10"]
+- [metosin/reitit-malli "0.5.10"]
+*** パッケージのバージョン管理
+- lein antient
+ 
+** SASS の統合
+clojure で CSS を書くことはできるが, SASS を書くことは難しい。
+bulma のような SASS を用いて上書きするタイプの CSS フレームワークは, 直接 SASS を書いたほうが早い。
+*** 導入方法
+#+BEGIN_SRC shell
+npm install node-sass --save-dev
+npm install bulma --save-dev
+#+END_SRC
+
+package.json について, scripts の項目を追加
+
+#+BEGIN_SRC json
+{
+  "name": "<package-name>",
+  "dependencies": {
+    "highlight.js": "9.18.1",
+    "react": "16.14.0",
+    "react-dom": "16.14.0",
+    "react-highlight.js": "1.0.7"
+  },
+  "devDependencies": {
+    "bulma": "^0.9.1",
+    "karma": "5.2.3",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-cljs-test": "0.1.0",
+    "karma-junit-reporter": "2.0.1",
+    "node-sass": "^4.14.1",
+    "shadow-cljs": "2.11.4"
+  },
+  "scripts": {
+    "css-build": "node-sass --omit-source-map-url sass/mystyles.scss resources/css/mystyles.css",
+    "css-watch": "npm run css-build -- --watch",
+    "start": "npm run css-watch"
+  }
+}
+#+END_SRC
+
+sass/mystyles.scss を編集する。以下は例
+#+BEGIN_SRC scss
+@charset "utf-8";
+$navbar-breakpoint: 760px;
+@import "../node_modules/bulma/bulma";
+#+END_SRC
+
+これを, `npm run css-build` とすると, resources/css/mystyles.css が生成される.
+index.html に `<link rel="stylesheet" href="css/mystyles.css">` とすることで, 生成された css を読み込める
+** ディレクトリ構成
+ - dev ... (not used)
+ - docs ... 開発ドキュメントとか
+ - resources ... リソース
+   - public ... public ディレクトリ
+     - css
+     - img
+     - js
+     - sw.js ... サービスワーカ
+ - src
+   - clj
+     - portcard
+         css.clj ... css コード
+   - cljs
+     - domains ... モデル spec 定義
+     - infrastructure
+       - firebaseui ... firebase の初期化などの処理
+     - interfaces
+       - storage ... local storage, session storage のための event
+     - services ... ページ単位のサービス実装
+       - xxx ... サービス名 ex. main
+         - db.cljs ... (optional) フォームなどの追加モデル定義
+         - events.cljs ... api 呼び出し, イベントハンドラ
+         - subs.cljs ... 画面読み込み
+         - views.cljs ... 画面生成
+     - routes.cljs ... ルーティング定義
+     - config.cljs ... debug / release 環境の切り替えなどの config
+     - core.cljs ... root
+     - utils utilities
+ - test テストコード
+
+** アプリの実行方法
+*** release
+#+BEGIN_SRC shell
+lein release
+#+END_SRC
+*** development
+#+BEGIN_SRC shell
+lein watch
+#+END_SRC
+*** css
+ - hot loading
+    #+BEGIN_SRC shell
+lein garden auto
+    #+END_SRC
+ - release
+    #+BEGIN_SRC shell
+lein garden once
+    #+END_SRC

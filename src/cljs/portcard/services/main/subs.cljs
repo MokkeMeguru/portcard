@@ -1,4 +1,4 @@
-(ns portcard.subs
+(ns portcard.services.main.subs
   (:require
    [re-frame.core :as re-frame]
    [goog.string :as gstring]

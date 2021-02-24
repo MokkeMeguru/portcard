@@ -66,7 +66,41 @@
  ::own-profile-loaded?
  :<- [::own-profile]
  (fn [own-profile _]
-   (empty? own-profile)))
+   (not (empty? own-profile))))
+
+;; payload
+(re-frame/reg-sub
+ ::payload-display-name
+ :<- [::display-name]
+ (fn [display-name _]
+   (when (-> display-name empty? not)
+     display-name)))
+
+(defn payload-contact [contact]
+  (let [contact (into {} (filter #(-> % second empty? not) contact))]
+    (when (-> contact empty? not)
+      contact)))
+
+(re-frame/reg-sub
+ ::payload-contact
+ :<- [::contact]
+ (fn [contact _]
+   (payload-contact contact)))
+
+(defn payload-form [display-name contact]
+  (into {} (filter #(-> % second empty? not) {:display-name display-name :contact contact})))
+
+(re-frame/reg-sub
+ ::payload-form
+ :<- [::payload-display-name]
+ :<- [::payload-contact]
+ (fn [[display-name contact] _]
+   (payload-form display-name contact)))
+
+;; (payload-contact {:email "" :twitter "" :facebook "helo"})
+;; (payload-form "hello"  {:facebook "hello"})
+;; (payload-form nil  {:facebook "hello"})
+
 ;; (.log js/console @(re-frame/subscribe [::edit-profile]))
 
 

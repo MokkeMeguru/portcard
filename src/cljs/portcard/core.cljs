@@ -2,8 +2,8 @@
   (:require
    [reagent.dom :as rdom]
    [re-frame.core :as re-frame]
-   [portcard.events :as events]
-   [portcard.views :as views]
+   [portcard.services.main.events :as events]
+   [portcard.services.main.views :as views]
    [portcard.config :as config]
    [portcard.routers :as routers]
    [portcard.services.auth.events :as auth-events]))
@@ -27,8 +27,8 @@
 
      (.then (.getIdToken (.. js/firebase auth -currentUser) true)
             (fn [id-token]
-              (re-frame/dispatch [::auth-events/login {:message? false
-                                                       :id-token id-token}]))))))
+              (re-frame/dispatch [::auth-events/signin {:message? false
+                                                        :id-token id-token}]))))))
 
 (defn init []
   (re-frame/dispatch-sync [::events/initialize-db])

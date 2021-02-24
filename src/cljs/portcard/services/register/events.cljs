@@ -2,10 +2,10 @@
   (:require [re-frame.core :as re-frame]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
-            [portcard.infrastructure.storage.events]
+            [portcard.interfaces.storage.events]
 
             [reitit.frontend.easy :as rfe]
-            [portcard.events :as events]
+            [portcard.services.main.events :as events]
             [portcard.domains.routes :as routes-domain]
             [reitit.frontend :as rf]
             [goog.string :as gstring]
@@ -93,7 +93,7 @@
          new-db (-> db
                     (assoc :uname uname)
                     (assoc :message "create-user")
-                    (assoc-in [:auth :login-state] :login))]
+                    (assoc-in [:auth :signin-state] :signin))]
      (rfe/push-state ::routes-domain/home)
      {:db new-db
       :storage/set {:storage-type "session" :name :firebase-auth :value "success"}})))

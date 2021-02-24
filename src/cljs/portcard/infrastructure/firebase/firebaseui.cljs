@@ -1,4 +1,4 @@
-(ns portcard.interfaces.firebaseui)
+(ns portcard.infrastructure.firebase.firebaseui)
 
 (defn firebaseui-init []
   (if-let [ui (.. js/firebaseui -auth -AuthUI getInstance)]

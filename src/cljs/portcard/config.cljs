@@ -4,7 +4,7 @@
   ^boolean goog.DEBUG)
 
 (def api-host
-  (if goog.DEBUG
+  (if debug?
     "http://localhost:3000"
     "https://portcard-api.megurumokke.org"))
 
