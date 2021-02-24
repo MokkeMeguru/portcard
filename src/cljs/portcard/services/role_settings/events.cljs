@@ -29,12 +29,26 @@
 (re-frame/reg-event-db
  ::role-link-name
  (fn [db [_ idx link-idx link-name]]
-   (assoc-in db [:edit-profile :roles idx :role-links link-idx :link-category-name] link-name)))
+   (let [db (cond
+              (or (empty? (-> db :edit-profile :roles))
+                  (nil? (-> db :edit-profile :roles (nth idx))))
+              (assoc-in db [:edit-profile :roles idx] {:role-links []})
+              (nil? (-> db :edit-profile :roles (nth idx) :role-links))
+              (assoc-in db [:edit-profile :roles idx :role-links] [])
+              :else db)]
+     (assoc-in db [:edit-profile :roles idx :role-links link-idx :link-category-name] link-name))))
 
 (re-frame/reg-event-db
  ::role-link-url
  (fn [db [_ idx link-idx link-url]]
-   (assoc-in db [:edit-profile :roles idx :role-links link-idx :link-url] link-url)))
+   (let [db (cond
+              (or (empty? (-> db :edit-profile :roles))
+                  (nil? (-> db :edit-profile :roles (nth idx))))
+              (assoc-in db [:edit-profile :roles idx] {:role-links []})
+              (nil? (-> db :edit-profile :roles (nth idx) :role-links))
+              (assoc-in db [:edit-profile :roles idx :role-links] [])
+              :else db)]
+     (assoc-in db [:edit-profile :roles idx :role-links link-idx :link-url] link-url))))
 
 (re-frame/reg-event-db
  ::remove-role-link
