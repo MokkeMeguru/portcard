@@ -92,3 +92,20 @@
                (-> topics-query
                    (assoc  :from (if idx (inc idx) nil))
                    (assoc :order "asc"))))))
+
+(re-frame/reg-sub
+ ::topics-from-selected?
+ :<- [::topics-query]
+ (fn [topics-query]
+   (not (nil? (:from topics-query)))))
+
+(re-frame/reg-sub
+ ::reset-topics-url
+ :<- [::topics-query]
+ :<- [::current-profile-uname]
+ (fn [[topics-query current-profile-uname]]
+   (rfe/href ::routes-domain/user-topics
+             {:user-id current-profile-uname}
+             (-> topics-query
+                 (dissoc :from)
+                 (dissoc :order)))))
