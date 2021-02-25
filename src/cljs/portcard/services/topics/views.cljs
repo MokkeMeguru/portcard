@@ -94,9 +94,9 @@
       [:div.topics-title
        [:nav.pagination {:role "navigation" :aria-label "pagination"}
         (cond
-          @latest-topics? [:a.pagination-previous.card-button {:href @reset-topics-url} "< Update"]
-          @topics-from-selected? [:a.pagination-previous.card-button {:href @previous-topics-url} "< Previous"]
-          :else [:a.pagination-previous.card-button {:disabled true} "< Previous"])
+          (not @topics-from-selected?)  [:a.pagination-previous.card-button {:disabled true} "< Reset"]
+          @latest-topics? [:a.pagination-previous.card-button {:href @reset-topics-url} "< Reset"]
+          :else [:a.pagination-previous.card-button {:href @previous-topics-url} "< Previous"])
         [:a.pagination-next.card-button
          (if @next-topics-exist? {:href @next-topics-url} {:disabled true})
          "Next >"]]])))
