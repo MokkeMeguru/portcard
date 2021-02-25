@@ -82,17 +82,21 @@
         (when-not (empty? @topic-filter) [:span " with category:" @topic-filter])]
        [:p "投稿されたトピックのタイルです。"
         [:br] "More リンク よりそれぞれの詳細ページへ遷移します。"]])))
+
 (defn topics-nav []
   (let [latest-topics? (re-frame/subscribe [::topics-subs/latest-topics?])
         next-topics-exist? (re-frame/subscribe [::topics-subs/next-topics-exist?])
         next-topics-url (re-frame/subscribe [::topics-subs/next-topics-url])
-        previous-topics-url (re-frame/subscribe [::topics-subs/previous-topics-url])]
+        previous-topics-url (re-frame/subscribe [::topics-subs/previous-topics-url])
+        reset-topics-url (re-frame/subscribe [::topics-subs/reset-topics-url])
+        topics-from-selected? (re-frame/subscribe [::topics-subs/topics-from-selected?])]
     (fn []
       [:div.topics-title
        [:nav.pagination {:role "navigation" :aria-label "pagination"}
-        [:a.pagination-previous.card-button
-         (if @latest-topics? {:disabled true} {:href @previous-topics-url})
-         "< Previous"]
+        (cond
+          (not @topics-from-selected?)  [:a.pagination-previous.card-button {:disabled true} "< Reset"]
+          @latest-topics? [:a.pagination-previous.card-button {:href @reset-topics-url} "< Reset"]
+          :else [:a.pagination-previous.card-button {:href @previous-topics-url} "< Previous"])
         [:a.pagination-next.card-button
          (if @next-topics-exist? {:href @next-topics-url} {:disabled true})
          "Next >"]]])))
