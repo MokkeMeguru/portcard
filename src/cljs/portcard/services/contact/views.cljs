@@ -16,7 +16,7 @@
        [:div.field-label.is-normal
         [:label.label "verfication"]]
        [:div.control.form
-        [:> ReCAPTCHA {:sitekey "6LeiG9sZAAAAAA9hS-VeHc6XyXvkzmJ_MO3Wwr6f"
+        [:> ReCAPTCHA {:sitekey "6Lf1imgaAAAAAIxmO9Co8YcUIK20YxOIlh5brD9d"
                        :on-change #(re-frame/dispatch [::contact-events/recaptcha %])}]]])))
 
 ;; (defn category-selector []
