@@ -3,7 +3,8 @@
             [goog.string :as gstring]
             [ajax.core :as ajax]
             [portcard.config :as config]
-            [portcard.services.main.events :as events]))
+            [portcard.services.main.events :as events]
+            [reitit.frontend.easy :as rfe]))
 
 ;; TODO: move into domain
 (defn ->topic [uname {:keys [uid idx title created_at image-blob description link category] :as m}]

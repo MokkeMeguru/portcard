@@ -7,6 +7,14 @@ body {
   width: 100%;
 }
 
+#footer a, #footer strong {
+  color: #F5E6DE;
+}
+
+#footer a:hover {
+  color: #ccbcb3;
+}
+
 #header {
   background: #3A2F33;
   padding: 0 2rem;

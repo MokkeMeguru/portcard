@@ -13,7 +13,11 @@
   [:body {:margin 0
           :background-color base-bg}]
   [:.level {:width "100%"}]
-
+  [:#footer
+   [:a :strong
+    {:color (str base-light-orange)}]
+   [:a:hover
+    {:color "#ccbcb3"}]]
   [:#header
    {:background base-dark
     :padding "0 2rem"
