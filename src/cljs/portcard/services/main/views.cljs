@@ -4,6 +4,7 @@
    [reagent.core :as r]
    [portcard.services.main.subs :as subs]
    [portcard.services.header.views :as header-views]
+   [portcard.services.footer.views :as footer-views]
    [portcard.domains.messages :as messages-domain]
    [portcard.domains.errors :as errors-domain]))
 
@@ -27,4 +28,5 @@
      [:main.bd-main
       [:div
        [:div.is-centered
-        (when @current-route (-> @current-route :data :view))]]]]))
+        (when @current-route (-> @current-route :data :view))]]]
+     [footer-views/footer]]))

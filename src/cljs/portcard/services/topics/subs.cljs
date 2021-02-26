@@ -86,12 +86,15 @@
  :<- [::current-topics]
  :<- [::current-profile-uname]
  (fn [[topics-query current-topics current-profile-uname]]
-   (let [idx (-> current-topics first :idx)]
+   (let [idx (if-let [idx (-> current-topics first :idx)] idx)]
      (rfe/href ::routes-domain/user-topics
                {:user-id current-profile-uname}
-               (-> topics-query
-                   (assoc  :from (if idx (inc idx) nil))
-                   (assoc :order "asc"))))))
+               (->>
+                (-> topics-query
+                    (assoc  :from (if idx (inc idx) (:from topics-query)))
+                    (assoc :order "asc"))
+                (remove (comp nil? val))
+                (into {}))))))
 
 (re-frame/reg-sub
  ::topics-from-selected?

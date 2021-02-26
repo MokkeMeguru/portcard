@@ -38,7 +38,8 @@
                               (fn [id-token]
                                 (re-frame/dispatch [::topics-events/delete-topic
                                                     {:id-token id-token
-                                                     :uid uid}])))
+                                                     :uid uid}])
+                                (.reload js/location)))
                              (reset! modal-open? false))}
 
                "Yes"]]
