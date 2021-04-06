@@ -8,6 +8,16 @@
     ],
     "rewrites": [
       {
+        "source": "/sitemap",
+        "destination": "/sitemap.xml",
+        "type": 301
+      },
+      {
+        "source": "/sitemap/**",
+        "destination": "/sitemap.xml",
+        "type": 302
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
