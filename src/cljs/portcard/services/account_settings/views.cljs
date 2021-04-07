@@ -21,7 +21,7 @@
          {:type "text" :placeholder "ユーザ名 (ひらがな / 漢字 可)"
           :class (if (account-settings-valids/display-name-is-valid? @display-name) "input is-danger" "input")
           :value @display-name
-          :on-change #(re-frame/dispatch [::account-settings-events/display-name (-> % .-target .-value)])}]
+          :on-change #(re-frame/dispatch-sync [::account-settings-events/display-name (-> % .-target .-value)])}]
         [:span.icon.is-small.is-left [:i.fas.fa-user]]
         (when-let [error-message (account-settings-valids/display-name-is-valid? @display-name)]
           [:p.help.is-danger error-message])]])))
@@ -41,7 +41,7 @@
          {:type "text" :placeholder "address@xxx.com"
           :class (if (account-settings-valids/email-is-valid? @email) "input is-danger" "input")
           :value @email
-          :on-change #(re-frame/dispatch [::account-settings-events/email (-> % .-target .-value)])}]
+          :on-change #(re-frame/dispatch-sync [::account-settings-events/email (-> % .-target .-value)])}]
         [:span.icon.is-left [:i.fas.fa-envelope.fa-xs]]
         (when-let [error-message (account-settings-valids/email-is-valid? @email)]
           [:p.help.is-danger error-message])]])))
@@ -56,7 +56,7 @@
          {:type "text" :placeholder "@xxxxx"
           :class (if (account-settings-valids/twitter-is-valid? @twitter) "input is-danger" "input")
           :value @twitter
-          :on-change #(re-frame/dispatch [::account-settings-events/twitter (-> % .-target .-value)])}]
+          :on-change #(re-frame/dispatch-sync [::account-settings-events/twitter (-> % .-target .-value)])}]
 
         [:span.icon.is-left [:i.fab.fa-twitter]]
         (when-let [error-message (account-settings-valids/twitter-is-valid? @twitter)]
@@ -72,7 +72,7 @@
          {:type "text" :placeholder "xxxxx"
           :class (if (account-settings-valids/facebook-is-valid? @facebook) "input is-danger" "input")
           :value @facebook
-          :on-change #(re-frame/dispatch [::account-settings-events/facebook (-> % .-target .-value)])}]
+          :on-change #(re-frame/dispatch-sync [::account-settings-events/facebook (-> % .-target .-value)])}]
         [:span.icon.is-left [:i.fab.fa-facebook]]
         (when-let [error-message (account-settings-valids/facebook-is-valid? @facebook)]
           [:p.help.is-danger error-message])]])))

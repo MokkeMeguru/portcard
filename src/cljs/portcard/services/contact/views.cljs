@@ -45,7 +45,7 @@
           {:type "text"
            :placeholder "件名"
            :value @title
-           :on-change #(re-frame/dispatch [::contact-events/title (-> % .-target .-value)])}]]
+           :on-change #(re-frame/dispatch-sync [::contact-events/title (-> % .-target .-value)])}]]
         (when-let [error-message (contact-valids/title-is-valid?   @title)]
           [:p.help.is-danger error-message])]])))
 
@@ -61,7 +61,7 @@
           {:type "text"
            :placeholder "somename@somehost.com"
            :value @from
-           :on-change #(re-frame/dispatch [::contact-events/from (-> % .-target .-value)])}]]
+           :on-change #(re-frame/dispatch-sync [::contact-events/from (-> % .-target .-value)])}]]
         (when-let [error-message (contact-valids/from-is-valid? @from)]
           [:p.help.is-danger error-message])]])))
 
@@ -77,7 +77,7 @@
           {:type "textarea"
            :placeholder "詳細の内容を記述ください (1024字以内)"
            :value @body-text
-           :on-change #(re-frame/dispatch [::contact-events/body-text (-> % .-target .-value)])}]
+           :on-change #(re-frame/dispatch-sync [::contact-events/body-text (-> % .-target .-value)])}]
          (when-let [error-message (contact-valids/body-text-is-valid? @body-text)]
            [:p.help.is-danger error-message])]]])))
 
@@ -93,7 +93,7 @@
           {:type "text"
            :placeholder "名前"
            :value @from-name
-           :on-change #(re-frame/dispatch [::contact-events/from-name (-> % .-target .-value)])}]]
+           :on-change #(re-frame/dispatch-sync [::contact-events/from-name (-> % .-target .-value)])}]]
         (when-let [error-message (contact-valids/from-name-is-valid? @from-name)]
           [:p.help.is-danger error-message])]])))
 
