@@ -17,7 +17,7 @@
           :placeholder "タイトル"
           :class (if (new-topic-valids/title-is-valid? @title) "input is-danger" "input")
           :value @title
-          :on-change #(re-frame/dispatch [::new-topic-events/title (-> % .-target .-value)])}]
+          :on-change #(re-frame/dispatch-sync [::new-topic-events/title (-> % .-target .-value)])}]
         (when-let [error-message (new-topic-valids/title-is-valid? @title)]
           [:p.help.is-danger error-message])]])))
 
@@ -34,7 +34,7 @@
           {:class (if (new-topic-valids/category-is-valid? @category) "select is-danger" "select")}
           [:select
            {:value (if @category (name @category) "---")
-            :on-change #(re-frame/dispatch [::new-topic-events/category (keyword (-> % .-target .-value))])}
+            :on-change #(re-frame/dispatch-sync [::new-topic-events/category (keyword (-> % .-target .-value))])}
            [:option {:value "---"} "---"]
            [:<>
             (doall
@@ -56,7 +56,7 @@
           :placeholder "詳細コメント"
           :class (if (new-topic-valids/description-is-valid? @description) "textarea is-danger" "textarea")
           :value @description
-          :on-change #(re-frame/dispatch [::new-topic-events/description (-> % .-target .-value)])}]
+          :on-change #(re-frame/dispatch-sync [::new-topic-events/description (-> % .-target .-value)])}]
         (when-let [error-message (new-topic-valids/description-is-valid? @description)]
           [:p.help.is-danger error-message])]])))
 
@@ -70,7 +70,7 @@
          {:type "text"
           :class (if (new-topic-valids/link-is-valid? @link) "input is-danger" "input")
           :placeholder "https://---"
-          :on-change #(re-frame/dispatch [::new-topic-events/link (-> % .-target .-value)])
+          :on-change #(re-frame/dispatch-sync [::new-topic-events/link (-> % .-target .-value)])
           :value @link}]
         (when-let [error-message (new-topic-valids/link-is-valid? @link)]
           [:p.help.is-danger error-message])]])))
