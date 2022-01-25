@@ -18,8 +18,7 @@
    [:img.icon-twitter {:src icon-src}]
    [:a.is-light {:href target-link
                  :data "hello"} target-display]])
-(re-frame/subscribe [::card-subs/current-profile-uname])
-(re-frame/subscribe [::card-subs/profile])
+
 (defn card-content-top []
   (let [name (re-frame/subscribe [::card-subs/display-name])
 
